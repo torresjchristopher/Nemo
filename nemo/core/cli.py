@@ -546,26 +546,40 @@ def start():
     try:
         import sys
         import importlib.util
+        from pathlib import Path
         
-        # Load module with dash in name using importlib
+        # Find the nemo repo location
+        nemo_package_path = Path(__file__).parent.parent
+        systems_path = nemo_package_path / "systems" / "task-screen-simulator"
+        
+        # Load four_button_interface
         spec = importlib.util.spec_from_file_location(
             "four_button_interface",
-            os.path.join(os.path.dirname(__file__), "..", "..", "systems", "task-screen-simulator", "four_button_interface.py")
+            str(systems_path / "four_button_interface.py")
         )
-        fbi_module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(fbi_module)
-        FourButtonInterface = fbi_module.FourButtonInterface
+        if spec and spec.loader:
+            fbi_module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(fbi_module)
+            FourButtonInterface = fbi_module.FourButtonInterface
+        else:
+            raise ImportError("Could not load four_button_interface")
         
+        # Load tts_engine
         spec2 = importlib.util.spec_from_file_location(
             "tts_engine",
-            os.path.join(os.path.dirname(__file__), "..", "..", "systems", "task-screen-simulator", "tts_engine.py")
+            str(systems_path / "tts_engine.py")
         )
-        tts_module = importlib.util.module_from_spec(spec2)
-        spec2.loader.exec_module(tts_module)
-        TTSEngine = tts_module.TTSEngine
+        if spec2 and spec2.loader:
+            tts_module = importlib.util.module_from_spec(spec2)
+            spec2.loader.exec_module(tts_module)
+            TTSEngine = tts_module.TTSEngine
+        else:
+            raise ImportError("Could not load tts_engine")
         
     except Exception as e:
         console.print(f"\n[red]✗ Failed to import required modules: {e}[/red]\n")
+        import traceback
+        traceback.print_exc()
         return
     
     console.print("\n[magenta bold]Starting 4-Button Control System...[/magenta bold]\n")
