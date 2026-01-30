@@ -544,9 +544,27 @@ def status():
 def start():
     """Start button listeners daemon"""
     try:
-        from nemo.systems.task_screen_simulator.four_button_interface import FourButtonInterface
-        from nemo.systems.task_screen_simulator.tts_engine import TTSEngine
-    except ImportError as e:
+        import sys
+        import importlib.util
+        
+        # Load module with dash in name using importlib
+        spec = importlib.util.spec_from_file_location(
+            "four_button_interface",
+            os.path.join(os.path.dirname(__file__), "..", "..", "systems", "task-screen-simulator", "four_button_interface.py")
+        )
+        fbi_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(fbi_module)
+        FourButtonInterface = fbi_module.FourButtonInterface
+        
+        spec2 = importlib.util.spec_from_file_location(
+            "tts_engine",
+            os.path.join(os.path.dirname(__file__), "..", "..", "systems", "task-screen-simulator", "tts_engine.py")
+        )
+        tts_module = importlib.util.module_from_spec(spec2)
+        spec2.loader.exec_module(tts_module)
+        TTSEngine = tts_module.TTSEngine
+        
+    except Exception as e:
         console.print(f"\n[red]✗ Failed to import required modules: {e}[/red]\n")
         return
     
@@ -554,19 +572,27 @@ def start():
     console.print("[cyan]Initializing components...[/cyan]")
     
     # Initialize interfaces
-    interface = FourButtonInterface()
-    tts_engine = TTSEngine()
+    try:
+        interface = FourButtonInterface()
+        tts_engine = TTSEngine()
+    except Exception as e:
+        console.print(f"[red]✗ Failed to initialize: {e}[/red]\n")
+        return
     
     # Define callbacks
     def on_tts_tap(event):
         console.print("\n[yellow]🔊 TTS activated - Listening...[/yellow]")
-        # This will be voice input → text → audio output
-        tts_engine.speak("Nemo text-to-speech enabled")
+        try:
+            tts_engine.speak("Nemo text-to-speech enabled")
+        except Exception as e:
+            console.print(f"[red]TTS Error: {e}[/red]")
     
     def on_gemini_tap(event):
         console.print("\n[yellow]🎤 Gemini activated - Recording audio...[/yellow]")
-        # This will record → send to Gemini → speak response
-        tts_engine.speak("Gemini voice mode started")
+        try:
+            tts_engine.speak("Gemini voice mode started")
+        except Exception as e:
+            console.print(f"[red]Gemini Error: {e}[/red]")
     
     def on_rewind(event):
         console.print("\n[yellow]⏮️  Rewinding - inferring past state...[/yellow]")
@@ -590,13 +616,20 @@ def start():
     console.print("\n[dim]Press Ctrl+C to stop...[/dim]\n")
     
     # Start listener
-    interface.start()
+    try:
+        interface.start()
+    except Exception as e:
+        console.print(f"[red]✗ Failed to start listener: {e}[/red]\n")
+        return
     
     try:
         while True:
             time.sleep(1)
     except KeyboardInterrupt:
-        interface.stop()
+        try:
+            interface.stop()
+        except:
+            pass
         console.print("\n[yellow]Shutting down...[/yellow]\n")
 
 
