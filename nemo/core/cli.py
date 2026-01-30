@@ -532,9 +532,9 @@ def status():
     status_table.add_column("Hotkey", style="blue")
     
     status_table.add_row("1", "Internet AI (Gemini)", "🟡 Ready", "RIGHT ALT")
-    status_table.add_row("2", "Text-to-Speech", "🟢 Ready", "LEFT ALT")
-    status_table.add_row("3", "Rewind (Past)", "🟢 Ready", "LEFT ALT + ←")
-    status_table.add_row("4", "Forward (Future)", "🟢 Ready", "LEFT ALT + →")
+    status_table.add_row("2", "Text-to-Speech", "🟢 Ready", "BACKSPACE")
+    status_table.add_row("3", "Rewind (Past)", "🟢 Ready", "RIGHT ALT + ←")
+    status_table.add_row("4", "Forward (Future)", "🟢 Ready", "RIGHT ALT + →")
     
     console.print(Panel(status_table, border_style="magenta", expand=False))
     console.print("\n[yellow]Run[/yellow] [cyan]nemo buttons start[/cyan] [yellow]to activate listeners[/yellow]\n")
@@ -546,9 +546,9 @@ def start():
     console.print("\n[magenta bold]Starting 4-Button Control System...[/magenta bold]\n")
     console.print("[cyan]Listening for hotkeys:[/cyan]\n")
     console.print("  🎤 [yellow]RIGHT ALT[/yellow]           → Gemini Voice AI")
-    console.print("  🔊 [yellow]LEFT ALT[/yellow]            → Text-to-Speech Output")
-    console.print("  ⏮️  [yellow]LEFT ALT + ← ARROW[/yellow]   → Rewind (infer past 5s)")
-    console.print("  ⏭️  [yellow]LEFT ALT + → ARROW[/yellow]   → Forward (predict next 5s)")
+    console.print("  🔊 [yellow]BACKSPACE[/yellow]          → Text-to-Speech Output")
+    console.print("  ⏮️  [yellow]RIGHT ALT + ← ARROW[/yellow]  → Rewind (infer past 5s)")
+    console.print("  ⏭️  [yellow]RIGHT ALT + → ARROW[/yellow]  → Forward (predict next 5s)")
     console.print("\n[dim]Press Ctrl+C to stop...[/dim]\n")
     
     try:
@@ -805,17 +805,17 @@ def help_quick():
          Speak to get AI response
          No text needed—just voice in, voice out
     
-      🔊 [yellow]LEFT ALT[/yellow]
+      🔊 [yellow]BACKSPACE[/yellow]
          Text-to-Speech Output
          Converts text to natural speech
          Zero data retention
     
-      ⏮️  [yellow]LEFT ALT + LEFT ARROW[/yellow]
+      ⏮️  [yellow]RIGHT ALT + LEFT ARROW[/yellow]
          REWIND (Temporal Inference)
          Infer what was on screen 5s ago
          No recording—pure inference
     
-      ⏭️  [yellow]LEFT ALT + RIGHT ARROW[/yellow]
+      ⏭️  [yellow]RIGHT ALT + RIGHT ARROW[/yellow]
          FORWARD (Temporal Prediction)
          Predict next user action
          Based on behavioral analysis

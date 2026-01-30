@@ -87,10 +87,10 @@ class FourButtonInterface:
         self.callbacks: Dict[str, Callable[[ButtonEvent], None]] = {
             'right_alt_tap': None,      # Internet AI voice
             'right_alt_hold': None,
-            'left_alt_tap': None,       # TTS button
-            'left_alt_hold': None,
-            'rewind': None,             # LEFT ALT + LEFT ARROW
-            'forward': None,            # LEFT ALT + RIGHT ARROW
+            'tts_button_tap': None,     # TTS button (Backspace)
+            'tts_button_hold': None,
+            'rewind': None,             # RIGHT ALT + LEFT ARROW
+            'forward': None,            # RIGHT ALT + RIGHT ARROW
         }
         
         # Current key state
@@ -202,11 +202,10 @@ class FourButtonInterface:
             if hasattr(key, 'name'):
                 key_name = key.name.lower()
                 
-                if 'alt' in key_name:
-                    if key_name == 'alt_l':
-                        return 'left_alt'
-                    elif key_name == 'alt_r':
-                        return 'right_alt'
+                if key_name == 'backspace':
+                    return 'tts_button'
+                elif key_name == 'alt_r':
+                    return 'right_alt'
                 
                 elif key_name == 'left':
                     return 'left_arrow'
