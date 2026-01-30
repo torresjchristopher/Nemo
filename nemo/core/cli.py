@@ -595,12 +595,44 @@ def start():
     
     # Define callbacks
     def on_tts_tap(event):
-        console.print("\n[green bold]✓ TTS ACTIVATED[/green bold]")
-        console.print("[yellow]🔊 Listening for speech input...[/yellow]")
+        console.print("\n[green bold]✓ RIGHT SHIFT ACTIVATED[/green bold]")
+        console.print("[yellow]🎤 Smart Speech-to-Text Mode[/yellow]")
+        
+        # Import voice input engine
         try:
-            tts_engine.speak("Text to speech activated")
+            from nemo.systems.task_screen_simulator.voice_input import VoiceInputEngine, VoiceInputConfig
         except Exception as e:
-            console.print(f"[red]TTS Error: {e}[/red]")
+            console.print(f"[red]✗ Voice input failed: {e}[/red]")
+            return
+        
+        # Transcription callback for live display
+        def show_transcription(text: str, is_final: bool):
+            if is_final:
+                console.print(f"\n[green]✓ You said:[/green] {text}")
+            else:
+                console.print(f"[yellow]{text}[/yellow]", end='\r', flush=True)
+        
+        try:
+            config = VoiceInputConfig()
+            voice_engine = VoiceInputEngine(
+                config=config,
+                tts_engine=tts_engine,
+                transcription_callback=show_transcription
+            )
+            
+            # Try to read highlighted text first
+            if voice_engine.read_highlighted_text():
+                pass  # Callback handled it
+            else:
+                # Listen to microphone
+                console.print("[yellow]Listening for speech (5 seconds)...[/yellow]")
+                voice_engine.listen_and_transcribe()
+                time.sleep(config.mic_timeout + 1)
+                result = voice_engine.get_transcription(timeout=1.0)
+                if not result:
+                    console.print("[dim][No speech detected][/dim]")
+        except Exception as e:
+            console.print(f"[red]✗ Error: {e}[/red]")
     
     def on_gemini_tap(event):
         console.print("\n[green bold]✓ GEMINI ACTIVATED[/green bold]")

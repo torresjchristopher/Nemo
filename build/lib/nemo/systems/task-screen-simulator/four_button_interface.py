@@ -142,9 +142,15 @@ class FourButtonInterface:
             return
         
         try:
+            # Debug: log all key presses to stderr
+            key_name = getattr(key, 'name', str(key))
+            print(f"[DEBUG] Key pressed: {key_name}", flush=True)
+            
             button_name = self._map_key(key)
             if button_name is None:
                 return
+            
+            print(f"[DEBUG] Mapped to button: {button_name}", flush=True)
             
             # Track press time
             if button_name not in self.press_times:
@@ -153,6 +159,8 @@ class FourButtonInterface:
             # Update state
             self.button_states[button_name] = ButtonState.PRESSED
             self.keys_pressed.add(button_name)
+            
+            print(f"[DEBUG] Button state: PRESSED, keys_pressed={self.keys_pressed}", flush=True)
             
             # Check for combos
             self._check_combo()
@@ -166,6 +174,9 @@ class FourButtonInterface:
             return
         
         try:
+            key_name = getattr(key, 'name', str(key))
+            print(f"[DEBUG] Key released: {key_name}", flush=True)
+            
             button_name = self._map_key(key)
             if button_name is None:
                 return
@@ -173,6 +184,8 @@ class FourButtonInterface:
             # Calculate press duration
             press_time = self.press_times.get(button_name, time.time())
             duration_ms = (time.time() - press_time) * 1000
+            
+            print(f"[DEBUG] Button {button_name} released after {duration_ms:.0f}ms", flush=True)
             
             # Update state
             self.button_states[button_name] = ButtonState.RELEASED
@@ -182,8 +195,10 @@ class FourButtonInterface:
             
             # Determine if TAP or HOLD
             if duration_ms < self.TAP_THRESHOLD_MS:
+                print(f"[DEBUG] TAP detected for {button_name}", flush=True)
                 self._handle_tap(button_name)
             else:
+                print(f"[DEBUG] HOLD detected for {button_name}", flush=True)
                 self._handle_hold_end(button_name, duration_ms)
             
             # Clean up
@@ -202,7 +217,7 @@ class FourButtonInterface:
             if hasattr(key, 'name'):
                 key_name = key.name.lower()
                 
-                if key_name == 'menu':  # Application/Menu key (right of RIGHT ALT)
+                if key_name == 'shift_r':  # RIGHT SHIFT
                     return 'tts_button'
                 elif key_name == 'alt_r':
                     return 'right_alt'
