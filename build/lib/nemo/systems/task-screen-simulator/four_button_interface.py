@@ -202,7 +202,7 @@ class FourButtonInterface:
             if hasattr(key, 'name'):
                 key_name = key.name.lower()
                 
-                if key_name == 'backspace':
+                if key_name == 'menu':  # Application/Menu key (right of RIGHT ALT)
                     return 'tts_button'
                 elif key_name == 'alt_r':
                     return 'right_alt'

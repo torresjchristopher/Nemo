@@ -626,7 +626,7 @@ def start():
     
     console.print("[cyan]Listening for hotkeys:[/cyan]\n")
     console.print("  🎤 [yellow]RIGHT ALT[/yellow]           → Gemini Voice AI")
-    console.print("  🔊 [yellow]MENU (Application)[/yellow]   → Text-to-Speech Output")
+    console.print("  🔊 [yellow]RIGHT SHIFT[/yellow]         → Text-to-Speech Output")
     console.print("  ⏮️  [yellow]RIGHT ALT + ← ARROW[/yellow]  → Rewind (infer past 5s)")
     console.print("  ⏭️  [yellow]RIGHT ALT + → ARROW[/yellow]  → Forward (predict next 5s)")
     console.print("\n[dim][Ctrl+C to stop][/dim]\n")
