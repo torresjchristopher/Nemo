@@ -679,10 +679,6 @@ def health():
     # Click
     health_table.add_row("Click CLI", "🟢 OK", click.__version__)
     
-    # Rich
-    from rich import __version__ as rich_version
-    health_table.add_row("Rich UI", "🟢 OK", rich_version)
-    
     # NumPy
     try:
         import numpy
