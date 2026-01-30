@@ -7,6 +7,10 @@ Keyboard interception, real-time intention prediction, system synthesis
 import click
 import time
 import threading
+import subprocess
+import requests
+import json
+from packaging import version as pkg_version
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
@@ -404,6 +408,89 @@ That's the Blanket Theory at work.
 Project Nemo: Where God's vision meets keyboard reality.
     """
     console.print(info, style="magenta")
+
+
+@cli.command()
+def update():
+    """Check for and install latest Nemo version from GitHub"""
+    CURRENT_VERSION = "1.0.0"
+    REPO = "torresjchristopher/nemo"
+    GITHUB_API = f"https://api.github.com/repos/{REPO}/releases/latest"
+    
+    console.print("\n[magenta]Checking for updates...[/magenta]\n")
+    
+    try:
+        # Fetch latest release info
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            console=console
+        ) as progress:
+            task = progress.add_task("Fetching latest release from GitHub...", total=None)
+            
+            response = requests.get(GITHUB_API, timeout=5)
+            response.raise_for_status()
+            latest_data = response.json()
+            latest_ver = latest_data['tag_name'].lstrip('v')
+            
+            progress.update(task, completed=True)
+        
+        # Compare versions
+        current = pkg_version.parse(CURRENT_VERSION)
+        latest = pkg_version.parse(latest_ver)
+        
+        console.print(f"[cyan]Current version:[/cyan] {CURRENT_VERSION}")
+        console.print(f"[cyan]Latest version:[/cyan] {latest_ver}")
+        
+        if latest > current:
+            console.print(f"\n[green]✓ Update available![/green] ({CURRENT_VERSION} → {latest_ver})\n")
+            
+            # Show release notes
+            release_notes = latest_data.get('body', 'No release notes available.')
+            console.print(Panel(release_notes[:500], title="[magenta]Release Notes[/magenta]", border_style="magenta"))
+            
+            # Perform update
+            console.print("\n[magenta]Installing latest version...[/magenta]\n")
+            with Progress(
+                SpinnerColumn(),
+                TextColumn("[progress.description]{task.description}"),
+                BarColumn(),
+                TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+                console=console
+            ) as progress:
+                task = progress.add_task("Running pip install --upgrade nemo...", total=100)
+                
+                try:
+                    result = subprocess.run(
+                        ["pip", "install", "--upgrade", "nemo", "--quiet"],
+                        capture_output=True,
+                        text=True,
+                        timeout=60
+                    )
+                    
+                    if result.returncode == 0:
+                        progress.update(task, completed=True)
+                        console.print(f"\n[green bold]✓ Successfully updated to Nemo v{latest_ver}![/green bold]\n")
+                        console.print("[cyan]Run 'nemo --version' to verify.[/cyan]\n")
+                    else:
+                        console.print(f"\n[red]✗ Update failed: {result.stderr}[/red]\n")
+                
+                except subprocess.TimeoutExpired:
+                    console.print("\n[red]✗ Update timed out[/red]\n")
+                except Exception as e:
+                    console.print(f"\n[red]✗ Error during update: {str(e)}[/red]\n")
+        
+        elif latest == current:
+            console.print(f"\n[yellow]✓ You're on the latest version![/yellow] ({CURRENT_VERSION})\n")
+        
+        else:
+            console.print(f"\n[yellow]⚠ You're running a newer version than latest release![/yellow]\n")
+    
+    except requests.exceptions.RequestException as e:
+        console.print(f"\n[red]✗ Failed to check for updates:[/red] {str(e)}\n")
+        console.print("[yellow]Make sure you have internet connection.[/yellow]\n")
+    except Exception as e:
+        console.print(f"\n[red]✗ Unexpected error:[/red] {str(e)}\n")
 
 
 if __name__ == '__main__':
