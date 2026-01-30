@@ -241,18 +241,15 @@ class FourButtonInterface:
         """Handle a TAP (short press)."""
         if button_name == 'right_alt':
             self._trigger_action('right_alt_tap')
-        elif button_name == 'left_alt':
-            # Only trigger if not part of combo
-            if 'left_arrow' not in self.keys_pressed and 'right_arrow' not in self.keys_pressed:
-                self._trigger_action('left_alt_tap')
+        elif button_name == 'tts_button':
+            self._trigger_action('tts_button_tap')
     
     def _handle_hold_end(self, button_name: str, duration_ms: float):
         """Handle end of HOLD (long press)."""
         if button_name == 'right_alt':
             self._trigger_action('right_alt_hold')
-        elif button_name == 'left_alt':
-            if 'left_arrow' not in self.keys_pressed and 'right_arrow' not in self.keys_pressed:
-                self._trigger_action('left_alt_hold')
+        elif button_name == 'tts_button':
+            self._trigger_action('tts_button_hold')
     
     def _trigger_action(self, action: str):
         """Trigger a registered action."""

@@ -543,7 +543,45 @@ def status():
 @buttons.command()
 def start():
     """Start button listeners daemon"""
+    try:
+        from nemo.systems.task_screen_simulator.four_button_interface import FourButtonInterface
+        from nemo.systems.task_screen_simulator.tts_engine import TTSEngine
+    except ImportError as e:
+        console.print(f"\n[red]✗ Failed to import required modules: {e}[/red]\n")
+        return
+    
     console.print("\n[magenta bold]Starting 4-Button Control System...[/magenta bold]\n")
+    console.print("[cyan]Initializing components...[/cyan]")
+    
+    # Initialize interfaces
+    interface = FourButtonInterface()
+    tts_engine = TTSEngine()
+    
+    # Define callbacks
+    def on_tts_tap(event):
+        console.print("\n[yellow]🔊 TTS activated - Listening...[/yellow]")
+        # This will be voice input → text → audio output
+        tts_engine.speak("Nemo text-to-speech enabled")
+    
+    def on_gemini_tap(event):
+        console.print("\n[yellow]🎤 Gemini activated - Recording audio...[/yellow]")
+        # This will record → send to Gemini → speak response
+        tts_engine.speak("Gemini voice mode started")
+    
+    def on_rewind(event):
+        console.print("\n[yellow]⏮️  Rewinding - inferring past state...[/yellow]")
+    
+    def on_forward(event):
+        console.print("\n[yellow]⏭️  Predicting - inferring future action...[/yellow]")
+    
+    # Register callbacks
+    interface.register_callback('tts_button_tap', on_tts_tap)
+    interface.register_callback('right_alt_tap', on_gemini_tap)
+    interface.register_callback('rewind', on_rewind)
+    interface.register_callback('forward', on_forward)
+    
+    console.print("[green]✓ Components initialized[/green]\n")
+    
     console.print("[cyan]Listening for hotkeys:[/cyan]\n")
     console.print("  🎤 [yellow]RIGHT ALT[/yellow]           → Gemini Voice AI")
     console.print("  🔊 [yellow]BACKSPACE[/yellow]          → Text-to-Speech Output")
@@ -551,11 +589,15 @@ def start():
     console.print("  ⏭️  [yellow]RIGHT ALT + → ARROW[/yellow]  → Forward (predict next 5s)")
     console.print("\n[dim]Press Ctrl+C to stop...[/dim]\n")
     
+    # Start listener
+    interface.start()
+    
     try:
         while True:
             time.sleep(1)
     except KeyboardInterrupt:
-        console.print("\n[yellow]Shutting down...[/yellow]")
+        interface.stop()
+        console.print("\n[yellow]Shutting down...[/yellow]\n")
 
 
 @buttons.command()
