@@ -9,6 +9,7 @@ nemo.egg-info/entry_points.txt
 nemo.egg-info/requires.txt
 nemo.egg-info/top_level.txt
 nemo/core/__init__.py
+nemo/core/buttons_start_new.py
 nemo/core/cli.py
 nemo/core/nemo.py
 nemo/systems/__init__.py

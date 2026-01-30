@@ -80,23 +80,24 @@ class KeyboardHotkeyListener:
         self.logger.info("Starting keyboard hotkey listener")
         
         try:
-            # Register hotkeys using keyboard library
+            # Register hotkeys using keyboard library with correct key names
+            # Use lambda to properly pass self to the callback methods
             # RIGHT SHIFT for TTS
-            keyboard.on_press_key('shift', self._on_right_shift_press, suppress=False)
-            keyboard.on_release_key('shift', self._on_right_shift_release, suppress=False)
+            keyboard.add_hotkey('right shift', lambda: self._on_right_shift_press(), suppress=False)
             
-            # RIGHT ALT for Gemini (alt_r)
-            keyboard.on_press_key('alt', self._on_right_alt_press, suppress=False)
-            keyboard.on_release_key('alt', self._on_right_alt_release, suppress=False)
+            # RIGHT ALT for Gemini
+            keyboard.add_hotkey('right alt', lambda: self._on_right_alt_press(), suppress=False)
             
-            # Arrow keys for rewind/forward
-            keyboard.on_press_key('left', self._on_left_arrow, suppress=False)
-            keyboard.on_press_key('right', self._on_right_arrow, suppress=False)
+            # Left/right arrow combos (with RIGHT ALT)
+            keyboard.add_hotkey('right alt+left', lambda: self._on_left_arrow(), suppress=False)
+            keyboard.add_hotkey('right alt+right', lambda: self._on_right_arrow(), suppress=False)
             
             self.logger.info("Keyboard hotkeys registered")
+            print("[SUCCESS] Keyboard hotkeys registered!", flush=True)
             
         except Exception as e:
             self.logger.error(f"Failed to register hotkeys: {e}")
+            print(f"[ERROR] Hotkey registration failed: {e}", flush=True)
             self.running = False
     
     def stop(self):
@@ -109,76 +110,37 @@ class KeyboardHotkeyListener:
                 pass
         self.logger.info("Keyboard hotkey listener stopped")
     
-    def _on_right_shift_press(self, event):
+    def _on_right_shift_press(self):
         """Handle RIGHT SHIFT press."""
         if not self.running:
             return
         
-        # Check if it's actually RIGHT SHIFT (not left shift)
-        if event.name == 'shift right' or (hasattr(event, 'is_keypad') and not event.is_keypad):
-            print("[DEBUG] RIGHT SHIFT PRESSED", flush=True)
-            self.key_press_times['tts'] = time.time()
+        print("[DEBUG] RIGHT SHIFT PRESSED", flush=True)
+        self._trigger_callback('tts_tap')
     
-    def _on_right_shift_release(self, event):
-        """Handle RIGHT SHIFT release."""
-        if not self.running or 'tts' not in self.key_press_times:
-            return
-        
-        if event.name == 'shift right' or (hasattr(event, 'is_keypad') and not event.is_keypad):
-            press_time = self.key_press_times.pop('tts', time.time())
-            duration_ms = (time.time() - press_time) * 1000
-            
-            print(f"[DEBUG] RIGHT SHIFT RELEASED after {duration_ms:.0f}ms", flush=True)
-            
-            # Trigger callback
-            if duration_ms < self.TAP_THRESHOLD_MS:
-                self._trigger_callback('tts_tap')
-            else:
-                self._trigger_callback('tts_hold')
-    
-    def _on_right_alt_press(self, event):
+    def _on_right_alt_press(self):
         """Handle RIGHT ALT press."""
         if not self.running:
             return
         
-        if event.name == 'alt right':
-            print("[DEBUG] RIGHT ALT PRESSED", flush=True)
-            self.key_press_times['gemini'] = time.time()
+        print("[DEBUG] RIGHT ALT PRESSED", flush=True)
+        self._trigger_callback('gemini_tap')
     
-    def _on_right_alt_release(self, event):
-        """Handle RIGHT ALT release."""
-        if not self.running or 'gemini' not in self.key_press_times:
+    def _on_left_arrow(self):
+        """Handle LEFT ARROW for rewind (with RIGHT ALT)."""
+        if not self.running:
             return
         
-        if event.name == 'alt right':
-            press_time = self.key_press_times.pop('gemini', time.time())
-            duration_ms = (time.time() - press_time) * 1000
-            
-            print(f"[DEBUG] RIGHT ALT RELEASED after {duration_ms:.0f}ms", flush=True)
-            
-            # Trigger callback
-            if duration_ms < self.TAP_THRESHOLD_MS:
-                self._trigger_callback('gemini_tap')
-            else:
-                self._trigger_callback('gemini_hold')
+        print("[DEBUG] REWIND (RIGHT ALT + LEFT)", flush=True)
+        self._trigger_callback('rewind')
     
-    def _on_left_arrow(self, event):
-        """Handle LEFT ARROW for rewind (if RIGHT ALT held)."""
-        if not self.running or 'gemini' not in self.key_press_times:
+    def _on_right_arrow(self):
+        """Handle RIGHT ARROW for forward (with RIGHT ALT)."""
+        if not self.running:
             return
         
-        if event.name == 'left':
-            print("[DEBUG] LEFT ARROW + RIGHT ALT (REWIND)", flush=True)
-            self._trigger_callback('rewind')
-    
-    def _on_right_arrow(self, event):
-        """Handle RIGHT ARROW for forward (if RIGHT ALT held)."""
-        if not self.running or 'gemini' not in self.key_press_times:
-            return
-        
-        if event.name == 'right':
-            print("[DEBUG] RIGHT ARROW + RIGHT ALT (FORWARD)", flush=True)
-            self._trigger_callback('forward')
+        print("[DEBUG] FORWARD (RIGHT ALT + RIGHT)", flush=True)
+        self._trigger_callback('forward')
     
     def _trigger_callback(self, action: str):
         """Trigger a registered callback."""
