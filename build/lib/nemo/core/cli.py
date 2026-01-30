@@ -595,16 +595,14 @@ def start():
     
     # Define callbacks
     def on_tts_tap(event):
-        console.print("\n[green bold]✓ TTS ACTIVATED[/green bold]")
-        console.print("[yellow]🔊 Listening for speech input...[/yellow]")
+        console.print("\n[yellow]🔊 TTS activated - Listening...[/yellow]")
         try:
-            tts_engine.speak("Text to speech activated")
+            tts_engine.speak("Nemo text-to-speech enabled")
         except Exception as e:
             console.print(f"[red]TTS Error: {e}[/red]")
     
     def on_gemini_tap(event):
-        console.print("\n[green bold]✓ GEMINI ACTIVATED[/green bold]")
-        console.print("[yellow]🎤 Recording audio...[/yellow]")
+        console.print("\n[yellow]🎤 Gemini activated - Recording audio...[/yellow]")
         try:
             tts_engine.speak("Gemini voice mode started")
         except Exception as e:
@@ -626,24 +624,21 @@ def start():
     
     console.print("[cyan]Listening for hotkeys:[/cyan]\n")
     console.print("  🎤 [yellow]RIGHT ALT[/yellow]           → Gemini Voice AI")
-    console.print("  🔊 [yellow]MENU (Application)[/yellow]   → Text-to-Speech Output")
+    console.print("  🔊 [yellow]BACKSPACE[/yellow]          → Text-to-Speech Output")
     console.print("  ⏮️  [yellow]RIGHT ALT + ← ARROW[/yellow]  → Rewind (infer past 5s)")
     console.print("  ⏭️  [yellow]RIGHT ALT + → ARROW[/yellow]  → Forward (predict next 5s)")
-    console.print("\n[dim][Ctrl+C to stop][/dim]\n")
+    console.print("\n[dim]Press Ctrl+C to stop...[/dim]\n")
     
     # Start listener
     try:
         interface.start()
-        console.print("[green]✓ Keyboard listener active[/green]\n")
     except Exception as e:
         console.print(f"[red]✗ Failed to start listener: {e}[/red]\n")
-        import traceback
-        traceback.print_exc()
         return
     
     try:
         while True:
-            time.sleep(0.1)
+            time.sleep(1)
     except KeyboardInterrupt:
         try:
             interface.stop()
