@@ -2,3 +2,23 @@ __pycache__/
 *.py[cod]
 .venv/
 venv/
+
+# Proprietary Modules (Compiled Only - Source Not in Repo)
+nemo/systems/task-screen-simulator/temporal_rewind.py
+nemo/systems/task-screen-simulator/temporal_forward.py
+nemo/systems/task-screen-simulator/agentic_synthesis.py
+
+# Environment variables
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+
+# Testing
+.pytest_cache/
