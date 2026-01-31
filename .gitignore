@@ -1,0 +1,70 @@
+# Nemo Repository .gitignore
+# Data invisibility: Never commit user data or sensitive components
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+*.log
+
+# Proprietary NEMO Modules (Compiled Only - Source Not Committed)
+# These are competitive moat and distributed as bytecode in releases
+nemo/keys/right_alt_left_rewind/**/*.py
+nemo/keys/right_alt_right_forward/**/*.py
+nemo/keys/right_alt_up_agent/**/*.py
+
+# Exclude actual files but keep structure
+!nemo/keys/right_alt_left_rewind/__init__.py
+!nemo/keys/right_alt_left_rewind/config.py
+!nemo/keys/right_alt_right_forward/__init__.py
+!nemo/keys/right_alt_right_forward/config.py
+!nemo/keys/right_alt_up_agent/__init__.py
+!nemo/keys/right_alt_up_agent/config.py
+
+# Keep documentation and tests
+!nemo/keys/right_alt_left_rewind/*.md
+!nemo/keys/right_alt_left_rewind/test_*.py
+
+# User data (if any)
+user_profiles/
+*.db
+*.sqlite
+
+# Temporary
+*.tmp
+temp/
+cache/
