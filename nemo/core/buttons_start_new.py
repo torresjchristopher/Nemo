@@ -326,22 +326,16 @@ def buttons_start_new():
                 active_voice_engine = None
     
     def on_rewind(event):
-        """RIGHT ALT + LEFT - Infer what happened 5 minutes ago"""
-        console.print("\n[yellow]⏮️  Rewind - inferring past 5 minutes...[/yellow]")
+        """RIGHT ALT + LEFT ARROW - REWIND SCREEN"""
+        console.print("\n[magenta bold]⏮️  REWIND - Rewinding screen...[/magenta bold]")
         
-        rewind_engine = _load_rewind()
-        if rewind_engine:
-            activity = rewind_engine.infer_past_activity(minutes_ago=5)
-            if activity:
-                console.print(f"[cyan]What you were doing 5 minutes ago:[/cyan]")
-                console.print(f"  Activity: {activity.get('activity_type', 'unknown')}")
-                console.print(f"  Application: {activity.get('likely_application', 'unknown')}")
-                console.print(f"  Intent: {activity.get('intent', 'unknown')}")
-                console.print(f"\n[dim]{activity.get('description', '')}[/dim]")
-            else:
-                console.print("[dim][No activity history yet][/dim]")
-        else:
-            console.print("[dim][Rewind engine not available][/dim]")
+        try:
+            from nemo.systems.task_screen_simulator.rewind_engine_v2 import get_rewind_engine
+            rewind = get_rewind_engine()
+            rewind.rewind_execute()
+            console.print(f"[magenta]✓ Rewind complete! Stack size: {rewind.get_size()}[/magenta]")
+        except Exception as e:
+            console.print(f"[red]✗ Rewind error: {e}[/red]")
     
     def on_forward(event):
         console.print("\n[yellow]⏭️  Forward - predicting next action...[/yellow]")

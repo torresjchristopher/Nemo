@@ -17,6 +17,12 @@ try:
 except ImportError:
     keyboard = None
 
+# Import the rewind engine for keystroke tracking
+try:
+    from .rewind_engine_v2 import RewindEngine
+except ImportError:
+    RewindEngine = None
+
 
 class HotkeyMode(Enum):
     """Hotkey activation mode."""
@@ -58,10 +64,12 @@ class KeyboardHotkeyListener:
             'gemini_hold_end': None,
             'rewind': None,
             'forward': None,
+            'agent_synthesis': None,  # RIGHT ALT + UP ARROW
         }
         
         # Key press tracking
         self.key_press_times: Dict[str, float] = {}
+        self.keys_currently_held: set = set()  # Track held keys for combos
         self.running = False
         self.listen_thread: Optional[threading.Thread] = None
         
@@ -101,22 +109,47 @@ class KeyboardHotkeyListener:
         # Track key press/release
         key_name = event.name.lower() if hasattr(event, 'name') else str(event)
         
+        # TRACK ALL KEYS FOR REWIND (except hotkeys themselves)
+        if RewindEngine is not None and event.event_type == 'down':
+            from .rewind_engine_v2 import get_rewind_engine
+            rewind = get_rewind_engine()
+            rewind.track(key_name)
+        
         if event.event_type == 'down':
             # Debounce: ignore repeat events, only fire on first press
             if key_name not in self.key_press_times:
                 self.key_press_times[key_name] = time.time()
+                self.keys_currently_held.add(key_name)
                 
                 # RIGHT SHIFT pressed
                 if key_name == 'right shift':
                     print("[DEBUG] RIGHT SHIFT PRESSED (DOWN)", flush=True)
                     self._trigger_callback('tts_hold_start')
                 
-                # RIGHT ALT pressed
+                # RIGHT ALT pressed (check for combos)
                 elif key_name == 'right alt':
                     print("[DEBUG] RIGHT ALT PRESSED (DOWN)", flush=True)
                     self._trigger_callback('gemini_hold_start')
+                
+                # Check for RIGHT ALT + arrow combos
+                elif key_name == 'left' and 'right alt' in self.keys_currently_held:
+                    print("[DEBUG] RIGHT ALT + LEFT ARROW - REWIND!", flush=True)
+                    self._trigger_callback('rewind')
+                
+                elif key_name == 'right' and 'right alt' in self.keys_currently_held:
+                    print("[DEBUG] RIGHT ALT + RIGHT ARROW - FORWARD!", flush=True)
+                    self._trigger_callback('forward')
+                
+                # NEW: RIGHT ALT + UP ARROW for agent synthesis
+                elif key_name == 'up' and 'right alt' in self.keys_currently_held:
+                    print("[DEBUG] RIGHT ALT + UP ARROW - AGENT SYNTHESIS", flush=True)
+                    self._trigger_callback('agent_synthesis')
         
         elif event.event_type == 'up':
+            # Track key release
+            if key_name in self.keys_currently_held:
+                self.keys_currently_held.discard(key_name)
+            
             # RIGHT SHIFT released
             if key_name == 'right shift' and 'right shift' in self.key_press_times:
                 held_time = time.time() - self.key_press_times['right shift']
