@@ -61,10 +61,10 @@ class VoiceInputMode(Enum):
 @dataclass
 class VoiceInputConfig:
     """Configuration for voice input engine."""
-    mic_timeout: float = 5.0  # Seconds to listen
+    mic_timeout: float = 10.0  # Seconds to listen
     phrase_time_limit: float = 15.0  # Max phrase length
     language: str = "en-US"
-    energy_threshold: int = 4000  # Mic sensitivity
+    energy_threshold: int = 300  # VERY SENSITIVE (lowered from 1500)
     show_partial: bool = True  # Show partial transcription in real-time
 
 
@@ -111,17 +111,18 @@ class VoiceInputEngine:
         try:
             self.recognizer = sr.Recognizer()
             self.recognizer.energy_threshold = self.config.energy_threshold
+            self.recognizer.dynamic_energy_threshold = False  # Don't auto-adjust threshold
             
             # List available microphones
             try:
-                mics = sr.Microphone.list_microphone_indexes()
+                mics = sr.Microphone.list_microphone_names()
                 self.logger.info(f"Available microphones: {len(mics)}")
             except:
                 pass
             
             # Try to use default microphone
             self.microphone = sr.Microphone()
-            self.logger.info("Speech recognizer initialized")
+            self.logger.info(f"Speech recognizer initialized (threshold: {self.recognizer.energy_threshold})")
             
         except Exception as e:
             self.logger.error(f"Failed to initialize speech recognizer: {e}")
@@ -256,27 +257,41 @@ class VoiceInputEngine:
                 if self.transcription_callback:
                     self.transcription_callback("[LISTENING...]", False)
                 
-                # Listen with timeout - but check stop_event periodically
-                # Use phrase_time_limit to break up listening into chunks
+                # Listen with timeout
                 try:
                     audio = self.recognizer.listen(
                         source,
                         timeout=self.config.mic_timeout,
                         phrase_time_limit=self.config.phrase_time_limit
                     )
-                except sr.RequestError as e:
-                    # timeout or no phrase detected
+                except sr.UnknownValueError:
+                    # No speech detected
                     if self.stop_event.is_set():
-                        return  # User released the button
-                    raise
+                        return
+                    if self.transcription_callback:
+                        self.transcription_callback("[NO SPEECH DETECTED]", True)
+                    return
+                except sr.RequestError as e:
+                    # Timeout or audio error
+                    if self.stop_event.is_set():
+                        return
+                    self.logger.error(f"Audio capture error: {e}")
+                    if self.transcription_callback:
+                        self.transcription_callback(f"[TIMEOUT - No sound detected]", True)
+                    return
             
             # Check if we should stop before transcribing
             if self.stop_event.is_set():
                 return
             
-            # Show processing state
+            # Show processing state with engine info
             if self.transcription_callback:
-                self.transcription_callback("[TRANSCRIBING...]", False)
+                self.transcription_callback("[RECOGNIZING...]", False)
+            
+            # Log to console for debugging
+            import sys
+            sys.stderr.write(f"[DEBUG] Trying speech recognition engines (energy threshold: {self.recognizer.energy_threshold})...\n")
+            sys.stderr.flush()
             
             # Try multiple speech recognition backends
             text = self._recognize_speech(audio)
@@ -301,17 +316,19 @@ class VoiceInputEngine:
         except sr.UnknownValueError:
             self.logger.warning("Could not understand audio")
             if self.transcription_callback and not self.stop_event.is_set():
-                self.transcription_callback("[COULD NOT UNDERSTAND]", True)
+                self.transcription_callback("[COULD NOT UNDERSTAND AUDIO]", True)
         
         except sr.RequestError as e:
             self.logger.error(f"Speech recognition service error: {e}")
             if self.transcription_callback and not self.stop_event.is_set():
-                self.transcription_callback(f"[ERROR: {str(e)[:50]}]", True)
+                self.transcription_callback(f"[API ERROR]", True)
         
         except Exception as e:
             self.logger.error(f"Transcription error: {e}")
+            import traceback
+            traceback.print_exc()
             if self.transcription_callback and not self.stop_event.is_set():
-                self.transcription_callback(f"[ERROR: {str(e)[:50]}]", True)
+                self.transcription_callback(f"[ERROR]", True)
     
     def _recognize_speech(self, audio) -> Optional[str]:
         """
@@ -321,19 +338,35 @@ class VoiceInputEngine:
         """
         try:
             # Try Google Speech Recognition (free, no key needed)
-            return self.recognizer.recognize_google(audio, language=self.config.language)
+            self.logger.info("Trying Google Speech Recognition...")
+            result = self.recognizer.recognize_google(audio, language=self.config.language)
+            self.logger.info(f"Google: Success - {result}")
+            return result
         
         except sr.UnknownValueError:
             self.logger.warning("Google: Could not understand audio")
         except sr.RequestError as e:
-            self.logger.warning(f"Google: {e}")
+            self.logger.warning(f"Google API error: {e}")
         
         try:
-            # Fallback: Try Sphinx (offline)
-            return self.recognizer.recognize_sphinx(audio)
+            # Fallback: Try Sphinx (offline, built-in)
+            self.logger.info("Trying Sphinx recognition...")
+            result = self.recognizer.recognize_sphinx(audio)
+            self.logger.info(f"Sphinx: Success - {result}")
+            return result
         except:
             self.logger.warning("Sphinx recognition failed")
         
+        try:
+            # Fallback: Try Microsoft Speech (Windows only, built-in)
+            self.logger.info("Trying Windows Speech Recognition...")
+            result = self.recognizer.recognize_microsoft_bing(audio)
+            self.logger.info(f"Microsoft Bing: Success - {result}")
+            return result
+        except:
+            self.logger.warning("Microsoft Bing recognition failed")
+        
+        self.logger.error("All recognition backends failed")
         return None
     
     def get_transcription(self, timeout: float = 0.1) -> Optional[dict]:

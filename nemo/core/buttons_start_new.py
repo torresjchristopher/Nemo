@@ -157,12 +157,22 @@ def buttons_start_new():
         console.print("\n[dim][Recording stopped][/dim]")
         
         if active_voice_engine:
-            active_voice_engine.stop_transcription()
-            # Get final result
-            result = active_voice_engine.get_transcription(timeout=0.5)
-            if result:
-                console.print(f"[green]✓ Final text:[/green] {result.get('text', '')}")
-            active_voice_engine = None
+            try:
+                # Stop the transcription thread
+                active_voice_engine.stop_transcription()
+                
+                # Wait for result (up to 2 seconds)
+                result = active_voice_engine.get_transcription(timeout=2.0)
+                
+                if result:
+                    text = result.get('text', '')
+                    console.print(f"[green]✓ Final text:[/green] {text}")
+                else:
+                    console.print("[dim][No speech detected - try again][/dim]")
+            except Exception as e:
+                console.print(f"[red]Error getting result: {e}[/red]")
+            finally:
+                active_voice_engine = None
     
     def on_gemini_hold_start(event):
         """RIGHT ALT pressed - start Gemini listening"""
