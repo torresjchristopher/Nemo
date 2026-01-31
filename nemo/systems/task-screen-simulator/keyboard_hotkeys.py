@@ -17,11 +17,12 @@ try:
 except ImportError:
     keyboard = None
 
-# Import the rewind engine for keystroke tracking
+# Import v3 rewind engine for keystroke tracking
 try:
-    from .rewind_engine_v2 import RewindEngine
+    from .rewind_engine_v3 import RewindEngineV3, get_rewind_engine
 except ImportError:
-    RewindEngine = None
+    RewindEngineV3 = None
+    get_rewind_engine = None
 
 
 class HotkeyMode(Enum):
@@ -62,7 +63,8 @@ class KeyboardHotkeyListener:
             'gemini_tap': None,
             'gemini_hold_start': None,
             'gemini_hold_end': None,
-            'rewind': None,
+            'rewind_start': None,  # RIGHT ALT + LEFT - start rewinding
+            'rewind_stop': None,   # RIGHT ALT released - stop rewinding
             'forward': None,
             'agent_synthesis': None,  # RIGHT ALT + UP ARROW
         }
@@ -72,6 +74,7 @@ class KeyboardHotkeyListener:
         self.keys_currently_held: set = set()  # Track held keys for combos
         self.running = False
         self.listen_thread: Optional[threading.Thread] = None
+        self._rewind_start_time = None
         
     def register_callback(self, action: str, callback: Callable[[HotkeyEvent], None]):
         """Register callback for hotkey action."""
@@ -109,11 +112,10 @@ class KeyboardHotkeyListener:
         # Track key press/release
         key_name = event.name.lower() if hasattr(event, 'name') else str(event)
         
-        # TRACK ALL KEYS FOR REWIND (except hotkeys themselves)
-        if RewindEngine is not None and event.event_type == 'down':
-            from .rewind_engine_v2 import get_rewind_engine
+        # TRACK ALL KEYS FOR REWIND (pre-computes reverse instructions)
+        if get_rewind_engine is not None and event.event_type == 'down':
             rewind = get_rewind_engine()
-            rewind.track(key_name)
+            rewind.track_keystroke(key_name)
         
         if event.event_type == 'down':
             # Debounce: ignore repeat events, only fire on first press
@@ -130,11 +132,15 @@ class KeyboardHotkeyListener:
                 elif key_name == 'right alt':
                     print("[DEBUG] RIGHT ALT PRESSED (DOWN)", flush=True)
                     self._trigger_callback('gemini_hold_start')
+                    # Start rewind if needed
+                    if get_rewind_engine:
+                        rewind = get_rewind_engine()
+                        self._rewind_start_time = time.time()
                 
                 # Check for RIGHT ALT + arrow combos
                 elif key_name == 'left' and 'right alt' in self.keys_currently_held:
-                    print("[DEBUG] RIGHT ALT + LEFT ARROW - REWIND!", flush=True)
-                    self._trigger_callback('rewind')
+                    print("[DEBUG] RIGHT ALT + LEFT ARROW - REWIND START!", flush=True)
+                    self._trigger_callback('rewind_start')
                 
                 elif key_name == 'right' and 'right alt' in self.keys_currently_held:
                     print("[DEBUG] RIGHT ALT + RIGHT ARROW - FORWARD!", flush=True)
@@ -163,6 +169,12 @@ class KeyboardHotkeyListener:
                 del self.key_press_times['right alt']
                 print(f"[DEBUG] RIGHT ALT RELEASED (UP, held {held_time:.2f}s)", flush=True)
                 self._trigger_callback('gemini_hold_end')
+                self._trigger_callback('rewind_stop')
+            
+            # LEFT ARROW released (stop rewind)
+            elif key_name == 'left' and 'right alt' in self.keys_currently_held:
+                # Rewind is still active while RIGHT ALT is held
+                pass
     
     def stop(self):
         """Stop listening for hotkeys."""

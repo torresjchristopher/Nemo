@@ -330,12 +330,27 @@ def buttons_start_new():
         console.print("\n[magenta bold]⏮️  REWIND - Rewinding screen...[/magenta bold]")
         
         try:
-            from nemo.systems.task_screen_simulator.rewind_engine_v2 import get_rewind_engine
+            from nemo.systems.task_screen_simulator.rewind_engine_v3 import get_rewind_engine
             rewind = get_rewind_engine()
-            rewind.rewind_execute()
-            console.print(f"[magenta]✓ Rewind complete! Stack size: {rewind.get_size()}[/magenta]")
+            rewind.rewind_continuous()
+            console.print(f"[magenta]✓ Rewind continuous! Stack size: {rewind.get_stack_size()}[/magenta]")
         except Exception as e:
             console.print(f"[red]✗ Rewind error: {e}[/red]")
+    
+    def on_rewind_start(event):
+        """RIGHT ALT + LEFT - Start continuous rewind"""
+        console.print("\n[magenta bold]⏮️  REWIND STARTED[/magenta bold]")
+    
+    def on_rewind_stop(event):
+        """RIGHT ALT released - Stop continuous rewind"""
+        console.print("[magenta]⏮️  REWIND COMPLETE[/magenta]")
+        
+        try:
+            from nemo.systems.task_screen_simulator.rewind_engine_v3 import get_rewind_engine
+            rewind = get_rewind_engine()
+            rewind.rewind_stop()
+        except Exception:
+            pass
     
     def on_forward(event):
         console.print("\n[yellow]⏭️  Forward - predicting next action...[/yellow]")
@@ -346,7 +361,8 @@ def buttons_start_new():
     listener.register_callback('tts_hold_end', on_tts_hold_end)
     listener.register_callback('gemini_hold_start', on_gemini_hold_start)
     listener.register_callback('gemini_hold_end', on_gemini_hold_end)
-    listener.register_callback('rewind', on_rewind)
+    listener.register_callback('rewind_start', on_rewind_start)
+    listener.register_callback('rewind_stop', on_rewind_stop)
     listener.register_callback('forward', on_forward)
     
     console.print("\n[cyan]Listening for hotkeys:[/cyan]\n")
