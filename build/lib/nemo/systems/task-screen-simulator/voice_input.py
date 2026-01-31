@@ -27,7 +27,29 @@ try:
 except ImportError:
     pyperclip = None
 
-from .tts_engine import TTSEngine
+# Import TTSEngine - try multiple ways to handle module loading
+try:
+    from .tts_engine import TTSEngine
+except (ImportError, ValueError):
+    # Fallback for when loaded via importlib
+    try:
+        import importlib.util
+        from pathlib import Path
+        spec = importlib.util.spec_from_file_location(
+            "tts_engine_fallback",
+            str(Path(__file__).parent / "tts_engine.py")
+        )
+        if spec and spec.loader:
+            tts_module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(tts_module)
+            TTSEngine = tts_module.TTSEngine
+        else:
+            raise ImportError("Could not load tts_engine")
+    except:
+        # If all else fails, define a minimal stub
+        class TTSEngine:
+            def speak(self, text, blocking=True):
+                pass
 
 
 class VoiceInputMode(Enum):

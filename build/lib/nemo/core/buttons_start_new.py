@@ -8,14 +8,35 @@ import importlib.util
 from pathlib import Path
 from rich.console import Console
 
-# Import voice input at module level to avoid import issues from nested functions
-try:
-    from nemo.systems.task_screen_simulator.voice_input import VoiceInputEngine, VoiceInputConfig
-except Exception as voice_err:
-    VoiceInputEngine = None
-    VoiceInputConfig = None
-
 console = Console()
+
+# Pre-load voice input at module level using importlib
+systems_path = None
+VoiceInputEngine = None
+VoiceInputConfig = None
+
+def _load_voice_input():
+    """Load voice input engine on demand"""
+    global systems_path, VoiceInputEngine, VoiceInputConfig
+    
+    if VoiceInputEngine is not None:
+        return  # Already loaded
+    
+    try:
+        nemo_package_path = Path(__file__).parent.parent
+        systems_path = nemo_package_path / "systems" / "task-screen-simulator"
+        
+        spec_voice = importlib.util.spec_from_file_location(
+            "voice_input_module",
+            str(systems_path / "voice_input.py")
+        )
+        if spec_voice and spec_voice.loader:
+            voice_module = importlib.util.module_from_spec(spec_voice)
+            spec_voice.loader.exec_module(voice_module)
+            VoiceInputEngine = voice_module.VoiceInputEngine
+            VoiceInputConfig = voice_module.VoiceInputConfig
+    except Exception as e:
+        console.print(f"[dim]Voice input load error: {e}[/dim]")
 
 def buttons_start_new():
     """Start button listeners daemon with keyboard library support"""
@@ -78,6 +99,9 @@ def buttons_start_new():
     def on_tts_tap(event):
         console.print("\n[green bold]✓ RIGHT SHIFT ACTIVATED[/green bold]")
         console.print("[yellow]🎤 Smart Speech-to-Text Mode[/yellow]")
+        
+        # Load voice input on first use
+        _load_voice_input()
         
         if VoiceInputEngine is None:
             console.print("[red]✗ Voice input not available[/red]")
