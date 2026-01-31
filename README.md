@@ -24,9 +24,25 @@ python -m nemo.cli.main
 
 **What you get:**
 - ✅ 5-minute temporal rewind (v1.0 NOW)
-- 🔜 15-minute snapshots (v2.0 Q2 2026)
-- 🎬 Netflix timeline browser (v2.5 Q2/Q3 2026)
-- 📅 Full week coverage (v3.0 Q3 2026)
+- 🔄 Weekly/bi-weekly updates (continuous evolution)
+- 🎯 Community-guided features (you shape direction)
+- 🎬 March toward Netflix UI (Q2-Q3 2026, community-validated)
+- 📅 Full week coverage (target Q3 2026)
+
+## 🎬 The Continuous Beta Model
+
+**Nemo isn't finished software. It's a living platform.**
+
+You're not downloading v1.0 and waiting. You're joining a community watching temporal computing unfold in real-time.
+
+**How it works:**
+- ✅ **Auto-updates via CLI** - Always on latest (weekly/bi-weekly patches)
+- ✅ **Community voting** - Your feedback shapes what we build next
+- ✅ **Patch notes as events** - Exciting updates you'll anticipate
+- ✅ **Transparent development** - See exactly where we're going
+- ✅ **Co-create the future** - Your ideas become features
+
+**The promise:** Watch Nemo evolve toward temporal git reality. Together.
 
 ## 📊 Core Features
 
