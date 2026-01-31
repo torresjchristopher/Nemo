@@ -173,6 +173,39 @@
                 }
             }
         </style>
+        <script>
+            // Simple click tracking - logs clicks to localStorage
+            const trackClick = (event, linkType) => {
+                const timestamp = new Date().toISOString();
+                const data = {
+                    type: linkType,
+                    timestamp: timestamp,
+                    href: event.target.href || 'N/A'
+                };
+                
+                // Log to localStorage for tracking
+                let metrics = JSON.parse(localStorage.getItem('nemo_clicks') || '[]');
+                metrics.push(data);
+                localStorage.setItem('nemo_clicks', JSON.stringify(metrics));
+                
+                console.log(`[NEMO METRICS] ${linkType}:`, data);
+            };
+            
+            // Attach tracking on page load
+            document.addEventListener('DOMContentLoaded', () => {
+                const downloadBtn = document.querySelector('a[href*="releases/download"]');
+                if (downloadBtn) {
+                    downloadBtn.addEventListener('click', (e) => trackClick(e, 'download'));
+                }
+                
+                document.querySelectorAll('.docs-links a').forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        const docType = link.textContent.trim().split(' ')[0];
+                        trackClick(e, `doc_${docType}`);
+                    });
+                });
+            });
+        </script>
     </head>
     <body>
         <div class="container">
