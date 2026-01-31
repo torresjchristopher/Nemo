@@ -43,9 +43,16 @@ Thumbs.db
 
 # Proprietary NEMO Modules (Compiled Only - Source Not Committed)
 # These are competitive moat and distributed as bytecode in releases
+# INCLUDES: Rewind, Forward, Progress, Temporal reasoning, Keystroke reversal
+
+# Key implementations (PROPRIETARY)
 nemo/keys/right_alt_left_rewind/**/*.py
 nemo/keys/right_alt_right_forward/**/*.py
 nemo/keys/right_alt_up_agent/**/*.py
+
+# Tools (PROPRIETARY) - Rewind/Forward/Progress logic
+nemo/tools/keystroke_processor/**/*.py
+nemo/tools/temporal_reasoner/**/*.py
 
 # Exclude actual files but keep structure
 !nemo/keys/right_alt_left_rewind/__init__.py
@@ -54,6 +61,12 @@ nemo/keys/right_alt_up_agent/**/*.py
 !nemo/keys/right_alt_right_forward/config.py
 !nemo/keys/right_alt_up_agent/__init__.py
 !nemo/keys/right_alt_up_agent/config.py
+
+# Public tools - Keep these
+!nemo/tools/nemo_engine/**/*.py
+!nemo/tools/nemo_key/**/*.py
+!nemo/tools/audio_capture/**/*.py
+!nemo/tools/screen_capture/**/*.py
 
 # Keep documentation and tests
 !nemo/keys/right_alt_left_rewind/*.md
