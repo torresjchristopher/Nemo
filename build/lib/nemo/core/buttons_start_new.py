@@ -14,6 +14,8 @@ console = Console()
 systems_path = None
 VoiceInputEngine = None
 VoiceInputConfig = None
+GeminiHandler = None
+TemporalRewindEngine = None
 
 def _load_voice_input():
     """Load voice input engine on demand"""
@@ -37,6 +39,66 @@ def _load_voice_input():
             VoiceInputConfig = voice_module.VoiceInputConfig
     except Exception as e:
         console.print(f"[dim]Voice input load error: {e}[/dim]")
+
+def _load_gemini():
+    """Load Gemini handler on demand"""
+    global systems_path, GeminiHandler
+    
+    if GeminiHandler is None:
+        try:
+            nemo_package_path = Path(__file__).parent.parent
+            systems_path = nemo_package_path / "systems" / "task-screen-simulator"
+            
+            spec_gemini = importlib.util.spec_from_file_location(
+                "gemini_handler_module",
+                str(systems_path / "gemini_handler.py")
+            )
+            if spec_gemini and spec_gemini.loader:
+                gemini_module = importlib.util.module_from_spec(spec_gemini)
+                spec_gemini.loader.exec_module(gemini_module)
+                GeminiHandler = gemini_module.GeminiHandler
+        except Exception as e:
+            console.print(f"[dim]Gemini load error: {e}[/dim]")
+            return None
+    
+    if GeminiHandler:
+        try:
+            import os
+            api_key = os.environ.get('GEMINI_API_KEY')
+            if not api_key:
+                return None
+            
+            from gemini_handler_module import GeminiConfig
+            config = GeminiConfig(api_key=api_key)
+            return GeminiHandler(config=config, tts_engine=tts_engine)
+        except Exception as e:
+            return None
+    return None
+
+def _load_rewind():
+    """Load temporal rewind engine on demand"""
+    global systems_path, TemporalRewindEngine
+    
+    if TemporalRewindEngine is None:
+        try:
+            nemo_package_path = Path(__file__).parent.parent
+            systems_path = nemo_package_path / "systems" / "task-screen-simulator"
+            
+            spec_rewind = importlib.util.spec_from_file_location(
+                "temporal_rewind_module",
+                str(systems_path / "temporal_rewind.py")
+            )
+            if spec_rewind and spec_rewind.loader:
+                rewind_module = importlib.util.module_from_spec(spec_rewind)
+                spec_rewind.loader.exec_module(rewind_module)
+                TemporalRewindEngine = rewind_module.TemporalRewindEngine
+        except Exception as e:
+            console.print(f"[dim]Rewind load error: {e}[/dim]")
+            return None
+    
+    if TemporalRewindEngine:
+        return TemporalRewindEngine(window_size_seconds=300)
+    return None
 
 def buttons_start_new():
     """Start button listeners daemon with keyboard library support"""
@@ -176,18 +238,114 @@ def buttons_start_new():
     
     def on_gemini_hold_start(event):
         """RIGHT ALT pressed - start Gemini listening"""
+        nonlocal active_voice_engine, recording
+        
+        if recording:
+            return
+        
+        recording = True
         console.print("\n[green bold]✓ RIGHT ALT HELD - Gemini Voice AI[/green bold]")
-        console.print("[yellow]🎤 Speak to Gemini...[/yellow]")
+        console.print("[yellow]🎤 Speak to Gemini (with optional screenshot)[/yellow]")
+        
+        # Load voice input and Gemini
+        _load_voice_input()
+        gemini_handler = _load_gemini()
+        
+        if VoiceInputEngine is None:
+            console.print("[red]✗ Voice input not available[/red]")
+            recording = False
+            return
+        
+        if gemini_handler is None:
+            console.print("[red]✗ Gemini not configured (set GEMINI_API_KEY)[/red]")
+            recording = False
+            return
+        
+        # Transcription callback
+        def show_transcription(text: str, is_final: bool):
+            if is_final:
+                console.print(f"\n[cyan]You said:[/cyan] {text}")
+            else:
+                import sys
+                sys.stdout.write(f"\r[cyan]Transcribing: {text}[/cyan]")
+                sys.stdout.flush()
+        
+        try:
+            config = VoiceInputConfig()
+            active_voice_engine = VoiceInputEngine(
+                config=config,
+                tts_engine=tts_engine,
+                transcription_callback=show_transcription
+            )
+            
+            # Listen to microphone
+            active_voice_engine.listen_and_transcribe()
+        except Exception as e:
+            console.print(f"[red]✗ Error: {e}[/red]")
+            recording = False
     
     def on_gemini_hold_end(event):
-        """RIGHT ALT released - Gemini done"""
-        console.print("[dim][Gemini listening ended][/dim]")
+        """RIGHT ALT released - send to Gemini"""
+        nonlocal active_voice_engine, recording
+        
+        if not recording:
+            return
+        
+        recording = False
+        console.print("\n[dim][Sending to Gemini...][/dim]")
+        
+        if active_voice_engine:
+            try:
+                # Stop recording
+                active_voice_engine.stop_transcription()
+                
+                # Get transcribed text
+                result = active_voice_engine.get_transcription(timeout=2.0)
+                
+                if result:
+                    voice_text = result.get('text', '')
+                    console.print(f"[green]✓ Transcribed:[/green] {voice_text}")
+                    
+                    # Load Gemini and send
+                    gemini_handler = _load_gemini()
+                    if gemini_handler and gemini_handler.model:
+                        # Process with optional screenshot
+                        response = gemini_handler.process_voice_with_screenshot(
+                            voice_text,
+                            capture_screenshot=True
+                        )
+                        if response:
+                            console.print(f"\n[cyan]Gemini:[/cyan] {response}")
+                    else:
+                        console.print("[dim][Gemini API key not configured][/dim]")
+                else:
+                    console.print("[dim][No speech detected][/dim]")
+            except Exception as e:
+                console.print(f"[red]Error: {e}[/red]")
+            finally:
+                active_voice_engine = None
     
     def on_rewind(event):
-        console.print("\n[yellow]⏮️  Rewind - inferring past 5 seconds...[/yellow]")
+        """RIGHT ALT + LEFT - Infer what happened 5 minutes ago"""
+        console.print("\n[yellow]⏮️  Rewind - inferring past 5 minutes...[/yellow]")
+        
+        rewind_engine = _load_rewind()
+        if rewind_engine:
+            activity = rewind_engine.infer_past_activity(minutes_ago=5)
+            if activity:
+                console.print(f"[cyan]What you were doing 5 minutes ago:[/cyan]")
+                console.print(f"  Activity: {activity.get('activity_type', 'unknown')}")
+                console.print(f"  Application: {activity.get('likely_application', 'unknown')}")
+                console.print(f"  Intent: {activity.get('intent', 'unknown')}")
+                console.print(f"\n[dim]{activity.get('description', '')}[/dim]")
+            else:
+                console.print("[dim][No activity history yet][/dim]")
+        else:
+            console.print("[dim][Rewind engine not available][/dim]")
     
     def on_forward(event):
         console.print("\n[yellow]⏭️  Forward - predicting next action...[/yellow]")
+        console.print("[dim][FORWARD prediction coming soon - machine learning integration][/dim]")
     
     # Register callbacks
     listener.register_callback('tts_hold_start', on_tts_hold_start)

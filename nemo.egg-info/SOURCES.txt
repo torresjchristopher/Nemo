@@ -17,6 +17,7 @@ nemo/systems/task-screen-simulator/audio_security.py
 nemo/systems/task-screen-simulator/cli.py
 nemo/systems/task-screen-simulator/download_manager.py
 nemo/systems/task-screen-simulator/four_button_interface.py
+nemo/systems/task-screen-simulator/gemini_handler.py
 nemo/systems/task-screen-simulator/gemini_integration.py
 nemo/systems/task-screen-simulator/keyboard_hotkeys.py
 nemo/systems/task-screen-simulator/keyboard_synthesizer.py
@@ -24,6 +25,7 @@ nemo/systems/task-screen-simulator/screen_analyzer.py
 nemo/systems/task-screen-simulator/setup.py
 nemo/systems/task-screen-simulator/setup_wizard.py
 nemo/systems/task-screen-simulator/temporal_inference.py
+nemo/systems/task-screen-simulator/temporal_rewind.py
 nemo/systems/task-screen-simulator/tts_engine.py
 nemo/systems/task-screen-simulator/voice_assistant.py
 nemo/systems/task-screen-simulator/voice_input.py
