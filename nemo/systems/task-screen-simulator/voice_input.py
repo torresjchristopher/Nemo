@@ -236,9 +236,19 @@ class VoiceInputEngine:
         
         return True
     
+    def stop_transcription(self):
+        """Stop active transcription immediately."""
+        self.stop_event.set()
+        if self.current_task and self.current_task.is_alive():
+            self.current_task.join(timeout=0.5)
+    
     def _transcribe_worker(self):
         """Worker thread for speech-to-text transcription."""
         try:
+            # Check if we should stop before starting
+            if self.stop_event.is_set():
+                return
+            
             with self.microphone as source:
                 self.logger.info("Listening for speech...")
                 
@@ -246,12 +256,23 @@ class VoiceInputEngine:
                 if self.transcription_callback:
                     self.transcription_callback("[LISTENING...]", False)
                 
-                # Listen with timeout
-                audio = self.recognizer.listen(
-                    source,
-                    timeout=self.config.mic_timeout,
-                    phrase_time_limit=self.config.phrase_time_limit
-                )
+                # Listen with timeout - but check stop_event periodically
+                # Use phrase_time_limit to break up listening into chunks
+                try:
+                    audio = self.recognizer.listen(
+                        source,
+                        timeout=self.config.mic_timeout,
+                        phrase_time_limit=self.config.phrase_time_limit
+                    )
+                except sr.RequestError as e:
+                    # timeout or no phrase detected
+                    if self.stop_event.is_set():
+                        return  # User released the button
+                    raise
+            
+            # Check if we should stop before transcribing
+            if self.stop_event.is_set():
+                return
             
             # Show processing state
             if self.transcription_callback:
@@ -279,17 +300,17 @@ class VoiceInputEngine:
         
         except sr.UnknownValueError:
             self.logger.warning("Could not understand audio")
-            if self.transcription_callback:
+            if self.transcription_callback and not self.stop_event.is_set():
                 self.transcription_callback("[COULD NOT UNDERSTAND]", True)
         
         except sr.RequestError as e:
             self.logger.error(f"Speech recognition service error: {e}")
-            if self.transcription_callback:
+            if self.transcription_callback and not self.stop_event.is_set():
                 self.transcription_callback(f"[ERROR: {str(e)[:50]}]", True)
         
         except Exception as e:
             self.logger.error(f"Transcription error: {e}")
-            if self.transcription_callback:
+            if self.transcription_callback and not self.stop_event.is_set():
                 self.transcription_callback(f"[ERROR: {str(e)[:50]}]", True)
     
     def _recognize_speech(self, audio) -> Optional[str]:

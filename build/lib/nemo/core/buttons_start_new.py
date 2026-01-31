@@ -95,16 +95,28 @@ def buttons_start_new():
         traceback.print_exc()
         return
     
-    # Define callbacks
-    def on_tts_tap(event):
-        console.print("\n[green bold]✓ RIGHT SHIFT ACTIVATED[/green bold]")
-        console.print("[yellow]🎤 Smart Speech-to-Text Mode[/yellow]")
+    # State for tracking active recording
+    active_voice_engine = None
+    recording = False
+    
+    # Define callbacks for hold-based recording
+    def on_tts_hold_start(event):
+        """RIGHT SHIFT pressed - start listening"""
+        nonlocal active_voice_engine, recording
+        
+        if recording:
+            return  # Already recording
+        
+        recording = True
+        console.print("\n[green bold]✓ RIGHT SHIFT HELD - Recording...[/green bold]")
+        console.print("[yellow]🎤 Speak now (release RIGHT SHIFT to end)[/yellow]")
         
         # Load voice input on first use
         _load_voice_input()
         
         if VoiceInputEngine is None:
             console.print("[red]✗ Voice input not available[/red]")
+            recording = False
             return
         
         # Transcription callback for live display
@@ -112,37 +124,54 @@ def buttons_start_new():
             if is_final:
                 console.print(f"\n[green]✓ You said:[/green] {text}")
             else:
-                console.print(f"[yellow]{text}[/yellow]", end='\r', flush=True)
+                # Live partial transcription
+                import sys
+                sys.stdout.write(f"\r[cyan]Transcribing: {text}[/cyan]")
+                sys.stdout.flush()
         
         try:
             config = VoiceInputConfig()
-            voice_engine = VoiceInputEngine(
+            active_voice_engine = VoiceInputEngine(
                 config=config,
                 tts_engine=tts_engine,
                 transcription_callback=show_transcription
             )
             
             # Try to read highlighted text first
-            if voice_engine.read_highlighted_text():
-                pass  # Callback handled it
-            else:
-                # Listen to microphone
-                console.print("[yellow]Listening for speech (5 seconds)...[/yellow]")
-                voice_engine.listen_and_transcribe()
-                time.sleep(config.mic_timeout + 1)
-                result = voice_engine.get_transcription(timeout=1.0)
-                if not result:
-                    console.print("[dim][No speech detected][/dim]")
+            highlighted = active_voice_engine.read_highlighted_text()
+            if not highlighted:
+                # Listen to microphone (will record until stopped)
+                active_voice_engine.listen_and_transcribe()
         except Exception as e:
             console.print(f"[red]✗ Error: {e}[/red]")
+            recording = False
     
-    def on_gemini_tap(event):
-        console.print("\n[green bold]✓ RIGHT ALT ACTIVATED[/green bold]")
-        console.print("[yellow]🎤 Gemini Voice AI Mode[/yellow]")
-        try:
-            tts_engine.speak("Gemini voice mode started", blocking=False)
-        except Exception as e:
-            console.print(f"[red]Error: {e}[/red]")
+    def on_tts_hold_end(event):
+        """RIGHT SHIFT released - stop listening"""
+        nonlocal active_voice_engine, recording
+        
+        if not recording:
+            return
+        
+        recording = False
+        console.print("\n[dim][Recording stopped][/dim]")
+        
+        if active_voice_engine:
+            active_voice_engine.stop_transcription()
+            # Get final result
+            result = active_voice_engine.get_transcription(timeout=0.5)
+            if result:
+                console.print(f"[green]✓ Final text:[/green] {result.get('text', '')}")
+            active_voice_engine = None
+    
+    def on_gemini_hold_start(event):
+        """RIGHT ALT pressed - start Gemini listening"""
+        console.print("\n[green bold]✓ RIGHT ALT HELD - Gemini Voice AI[/green bold]")
+        console.print("[yellow]🎤 Speak to Gemini...[/yellow]")
+    
+    def on_gemini_hold_end(event):
+        """RIGHT ALT released - Gemini done"""
+        console.print("[dim][Gemini listening ended][/dim]")
     
     def on_rewind(event):
         console.print("\n[yellow]⏮️  Rewind - inferring past 5 seconds...[/yellow]")
@@ -151,8 +180,10 @@ def buttons_start_new():
         console.print("\n[yellow]⏭️  Forward - predicting next action...[/yellow]")
     
     # Register callbacks
-    listener.register_callback('tts_tap', on_tts_tap)
-    listener.register_callback('gemini_tap', on_gemini_tap)
+    listener.register_callback('tts_hold_start', on_tts_hold_start)
+    listener.register_callback('tts_hold_end', on_tts_hold_end)
+    listener.register_callback('gemini_hold_start', on_gemini_hold_start)
+    listener.register_callback('gemini_hold_end', on_gemini_hold_end)
     listener.register_callback('rewind', on_rewind)
     listener.register_callback('forward', on_forward)
     

@@ -51,9 +51,11 @@ class KeyboardHotkeyListener:
         # Callbacks
         self.callbacks: Dict[str, Callable[[HotkeyEvent], None]] = {
             'tts_tap': None,
-            'tts_hold': None,
+            'tts_hold_start': None,
+            'tts_hold_end': None,
             'gemini_tap': None,
-            'gemini_hold': None,
+            'gemini_hold_start': None,
+            'gemini_hold_end': None,
             'rewind': None,
             'forward': None,
         }
@@ -80,17 +82,8 @@ class KeyboardHotkeyListener:
         self.logger.info("Starting keyboard hotkey listener")
         
         try:
-            # Register hotkeys using keyboard library with correct key names
-            # Use lambda to properly pass self to the callback methods
-            # RIGHT SHIFT for TTS
-            keyboard.add_hotkey('right shift', lambda: self._on_right_shift_press(), suppress=False)
-            
-            # RIGHT ALT for Gemini
-            keyboard.add_hotkey('right alt', lambda: self._on_right_alt_press(), suppress=False)
-            
-            # Left/right arrow combos (with RIGHT ALT)
-            keyboard.add_hotkey('right alt+left', lambda: self._on_left_arrow(), suppress=False)
-            keyboard.add_hotkey('right alt+right', lambda: self._on_right_arrow(), suppress=False)
+            # Use keyboard.hook() to detect key press/release for hold behavior
+            keyboard.hook(self._on_keyboard_event)
             
             self.logger.info("Keyboard hotkeys registered")
             print("[SUCCESS] Keyboard hotkeys registered!", flush=True)
@@ -99,6 +92,44 @@ class KeyboardHotkeyListener:
             self.logger.error(f"Failed to register hotkeys: {e}")
             print(f"[ERROR] Hotkey registration failed: {e}", flush=True)
             self.running = False
+    
+    def _on_keyboard_event(self, event):
+        """Handle all keyboard events to detect press/release."""
+        if not self.running:
+            return
+        
+        # Track key press/release
+        key_name = event.name.lower() if hasattr(event, 'name') else str(event)
+        
+        if event.event_type == 'down':
+            # Debounce: ignore repeat events, only fire on first press
+            if key_name not in self.key_press_times:
+                self.key_press_times[key_name] = time.time()
+                
+                # RIGHT SHIFT pressed
+                if key_name == 'right shift':
+                    print("[DEBUG] RIGHT SHIFT PRESSED (DOWN)", flush=True)
+                    self._trigger_callback('tts_hold_start')
+                
+                # RIGHT ALT pressed
+                elif key_name == 'right alt':
+                    print("[DEBUG] RIGHT ALT PRESSED (DOWN)", flush=True)
+                    self._trigger_callback('gemini_hold_start')
+        
+        elif event.event_type == 'up':
+            # RIGHT SHIFT released
+            if key_name == 'right shift' and 'right shift' in self.key_press_times:
+                held_time = time.time() - self.key_press_times['right shift']
+                del self.key_press_times['right shift']
+                print(f"[DEBUG] RIGHT SHIFT RELEASED (UP, held {held_time:.2f}s)", flush=True)
+                self._trigger_callback('tts_hold_end')
+            
+            # RIGHT ALT released
+            elif key_name == 'right alt' and 'right alt' in self.key_press_times:
+                held_time = time.time() - self.key_press_times['right alt']
+                del self.key_press_times['right alt']
+                print(f"[DEBUG] RIGHT ALT RELEASED (UP, held {held_time:.2f}s)", flush=True)
+                self._trigger_callback('gemini_hold_end')
     
     def stop(self):
         """Stop listening for hotkeys."""
