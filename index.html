@@ -3,534 +3,554 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nemo | Temporal Git for Your Life</title>
+    <title>Nemo | Temporal Git with Groundbreaking Context Evaluation</title>
     <link rel="icon" type="image/png" href="favicon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #0f172a; color: white; font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
-        .gradient-text {
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #0f172a;
+            color: #ffffff;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Gradients */
+        .gradient-cyan { background: linear-gradient(135deg, #06b6d4, #0ea5e9); }
+        .gradient-purple { background: linear-gradient(135deg, #a855f7, #ec4899); }
+        .gradient-text-cyan {
             background: linear-gradient(90deg, #06b6d4, #0ea5e9);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         .gradient-text-purple {
             background: linear-gradient(90deg, #a855f7, #ec4899);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .nav-link.active { color: #06b6d4; border-bottom: 2px solid #06b6d4; }
-        .feature-card {
-            background: linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
-            border: 1px solid rgba(6, 182, 212, 0.2);
+
+        /* Glowing effect */
+        .glow-cyan {
+            box-shadow: 0 0 30px rgba(6, 182, 212, 0.3), inset 0 0 30px rgba(6, 182, 212, 0.1);
         }
-        .timeline-item {
-            position: relative;
-            padding-left: 40px;
+        .glow-purple {
+            box-shadow: 0 0 30px rgba(168, 85, 247, 0.3), inset 0 0 30px rgba(168, 85, 247, 0.1);
         }
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 24px;
-            height: 24px;
-            background: radial-gradient(circle, #06b6d4, #0ea5e9);
-            border-radius: 50%;
-            border: 3px solid #0f172a;
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
         }
+        .animate-float { animation: float 3s ease-in-out infinite; }
+
+        /* Smooth scroll */
+        html { scroll-behavior: smooth; }
     </style>
 </head>
-<body class="antialiased">
-    <nav class="p-6 border-b border-slate-800 sticky top-0 bg-slate-950/80 backdrop-blur-md z-50">
-        <div class="max-w-6xl mx-auto flex justify-between items-center">
-            <div class="text-2xl font-bold gradient-text">Nemo</div>
-            <div class="flex space-x-8 font-medium">
-                <button onclick="showTab('home')" id="nav-home" class="nav-link active pb-1 transition hover:text-cyan-400">Home</button>
-                <button onclick="showTab('features')" id="nav-features" class="nav-link pb-1 transition hover:text-cyan-400">Features</button>
-                <button onclick="showTab('roadmap')" id="nav-roadmap" class="nav-link pb-1 transition hover:text-cyan-400">Roadmap</button>
-                <button onclick="showTab('technical')" id="nav-technical" class="nav-link pb-1 transition hover:text-cyan-400">Vision</button>
-            </div>
-            <div class="flex space-x-4">
-                <a href="https://github.com/torresjchristopher/Nemo" target="_blank" title="GitHub Repository">
-                    <svg class="w-6 h-6 fill-current text-slate-400 hover:text-white" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+<body>
+    <!-- Navigation -->
+    <nav class="fixed w-full top-0 z-50 bg-slate-950/80 backdrop-blur-lg border-b border-slate-800/50">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span class="text-xl font-bold gradient-text-cyan">NEMO</span>
+                </div>
+                <div class="hidden md:flex space-x-8 text-sm font-medium">
+                    <a href="#features" class="hover:text-cyan-400 transition">Features</a>
+                    <a href="#technology" class="hover:text-cyan-400 transition">Technology</a>
+                    <a href="#roadmap" class="hover:text-cyan-400 transition">Roadmap</a>
+                    <a href="https://github.com/torresjchristopher/Nemo" target="_blank" class="hover:text-cyan-400 transition">GitHub</a>
+                </div>
+                <a href="https://github.com/torresjchristopher/Nemo" target="_blank" class="inline-flex items-center space-x-2 px-6 py-2 bg-cyan-600 hover:bg-cyan-700 rounded-lg font-semibold transition">
+                    <span>Download</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
                 </a>
             </div>
         </div>
     </nav>
 
-    <!-- TAB: HOME -->
-    <div id="home" class="tab-content active">
-        <header class="py-20 text-center max-w-4xl mx-auto px-6">
-            <h1 class="text-6xl md:text-7xl font-bold mb-6 tracking-tight leading-[1.1]">Git for Your <br/><span class="gradient-text-purple">Entire Life.</span></h1>
-            <p class="text-xl text-slate-400 mb-10 leading-relaxed max-w-2xl mx-auto">Go back an entire week with full context. Rewind, browse, and restore any moment. Nemo is the temporal version control system for everything you do.</p>
-            <div class="flex flex-col items-center space-y-6">
-                <div class="flex justify-center space-x-4">
-                    <button class="bg-cyan-600 px-8 py-3.5 rounded-lg font-semibold text-base hover:bg-cyan-700 transition-all shadow-lg shadow-cyan-500/10">Download Beta</button>
-                    <a href="https://github.com/torresjchristopher/Nemo" target="_blank" class="border border-slate-700 px-8 py-3.5 rounded-lg font-semibold text-base hover:bg-slate-800 transition-all">View on GitHub</a>
-                </div>
-                <p class="text-sm text-slate-500 italic">v1.0 Beta - Full week temporal library coming Q2 2026</p>
+    <!-- Hero Section -->
+    <section class="relative pt-32 pb-20 px-6 overflow-hidden">
+        <div class="max-w-6xl mx-auto">
+            <!-- Background elements -->
+            <div class="absolute inset-0 -z-10">
+                <div class="absolute top-20 left-1/2 -translate-x-1/2 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl"></div>
+                <div class="absolute bottom-0 right-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
             </div>
 
-            <!-- Hero Graphic -->
-            <div class="mt-16 bg-gradient-to-b from-slate-900/50 to-slate-950 border border-slate-800/50 rounded-2xl shadow-2xl overflow-hidden">
-                <div class="p-8 text-left">
-                    <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-cyan-400 font-mono text-sm font-bold uppercase tracking-widest">Temporal Timeline</h3>
-                        <div class="flex space-x-2">
-                            <div class="w-2 h-2 rounded-full bg-slate-700"></div>
-                            <div class="w-2 h-2 rounded-full bg-slate-700"></div>
-                        </div>
-                    </div>
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between p-4 bg-slate-900/50 rounded-lg border border-cyan-500/20">
-                            <div>
-                                <p class="text-cyan-400 font-semibold text-sm">Today at 14:32</p>
-                                <p class="text-slate-500 text-xs">Email sent, project updated</p>
-                            </div>
-                            <div class="text-right">
-                                <button class="px-3 py-1.5 bg-cyan-600/30 hover:bg-cyan-600/50 rounded text-xs font-bold text-cyan-400 transition">JUMP</button>
-                            </div>
-                        </div>
-                        <div class="flex items-center justify-between p-4 bg-slate-900/30 rounded-lg border border-slate-700/20">
-                            <div>
-                                <p class="text-slate-300 font-semibold text-sm">3 days ago at 09:15</p>
-                                <p class="text-slate-500 text-xs">Presentation meeting, notes taken</p>
-                            </div>
-                            <div class="text-right">
-                                <button class="px-3 py-1.5 bg-slate-600/30 hover:bg-slate-600/50 rounded text-xs font-bold text-slate-400 transition">JUMP</button>
-                            </div>
-                        </div>
-                        <div class="flex items-center justify-between p-4 bg-slate-900/30 rounded-lg border border-slate-700/20">
-                            <div>
-                                <p class="text-slate-300 font-semibold text-sm">1 week ago at 16:45</p>
-                                <p class="text-slate-500 text-xs">Project launch completed</p>
-                            </div>
-                            <div class="text-right">
-                                <button class="px-3 py-1.5 bg-slate-600/30 hover:bg-slate-600/50 rounded text-xs font-bold text-slate-400 transition">JUMP</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </header>
-    </div>
-
-    <!-- TAB: FEATURES -->
-    <div id="features" class="tab-content py-20">
-        <div class="max-w-6xl mx-auto px-6">
-            <h2 class="text-4xl font-bold mb-16 text-center tracking-tight">Temporal Computing, <br/><span class="gradient-text">Reimagined</span></h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-                <!-- Feature 1 -->
-                <div class="feature-card p-8 rounded-xl">
-                    <div class="mb-6">
-                        <div class="w-14 h-14 bg-cyan-500/20 rounded-lg flex items-center justify-center mb-4">
-                            <svg class="w-7 h-7 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        </div>
-                        <h3 class="text-xl font-bold">One-Week Temporal Window</h3>
-                    </div>
-                    <p class="text-slate-400 leading-relaxed">Access any moment from the past 7 days. Your entire week of work, conversations, and context is always available. No searching, no wondering—just jump.</p>
+            <div class="text-center max-w-4xl mx-auto mb-16">
+                <div class="inline-flex items-center space-x-2 mb-6 px-4 py-2 rounded-full border border-cyan-500/30 bg-cyan-500/10">
+                    <span class="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></span>
+                    <span class="text-sm text-cyan-300">v1.0 Beta - Public Launch</span>
                 </div>
 
-                <!-- Feature 2 -->
-                <div class="feature-card p-8 rounded-xl">
-                    <div class="mb-6">
-                        <div class="w-14 h-14 bg-purple-500/20 rounded-lg flex items-center justify-center mb-4">
-                            <svg class="w-7 h-7 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg>
-                        </div>
-                        <h3 class="text-xl font-bold">Full Context Preservation</h3>
-                    </div>
-                    <p class="text-slate-400 leading-relaxed">Every snapshot captures your complete context: screens, keystrokes, files changed, apps open. Rewind isn't just undo—it's full temporal restoration.</p>
+                <h1 class="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+                    Temporal Git for Your <span class="gradient-text-purple">Entire Life</span>
+                </h1>
+
+                <p class="text-xl md:text-2xl text-slate-300 mb-8 leading-relaxed max-w-3xl mx-auto">
+                    Software designed to achieve <span class="font-bold text-cyan-400">temporal version control with groundbreaking context evaluation</span>. Perfect 5-minute rewind. Browse your entire week. Restore any moment.
+                </p>
+
+                <div class="flex flex-col sm:flex-row justify-center gap-4 mb-12">
+                    <button class="px-8 py-4 bg-gradient-cyan text-white font-bold rounded-lg hover:shadow-xl hover:shadow-cyan-500/50 transition-all transform hover:scale-105">
+                        Download Beta v1.0
+                    </button>
+                    <a href="https://github.com/torresjchristopher/Nemo" target="_blank" class="px-8 py-4 border-2 border-slate-600 hover:border-cyan-400 text-white font-bold rounded-lg hover:bg-slate-900/50 transition-all">
+                        View on GitHub →
+                    </a>
                 </div>
 
-                <!-- Feature 3 -->
-                <div class="feature-card p-8 rounded-xl">
-                    <div class="mb-6">
-                        <div class="w-14 h-14 bg-pink-500/20 rounded-lg flex items-center justify-center mb-4">
-                            <svg class="w-7 h-7 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M17.657 17.657a8 8 0 01-11.314 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        </div>
-                        <h3 class="text-xl font-bold">Netflix-Style Timeline Browser</h3>
-                    </div>
-                    <p class="text-slate-400 leading-relaxed">Scrub through your week like a Netflix timeline. Hover to preview, click to jump. Visualize your entire life with elegant temporal controls.</p>
-                </div>
-
-                <!-- Feature 4 -->
-                <div class="feature-card p-8 rounded-xl">
-                    <div class="mb-6">
-                        <div class="w-14 h-14 bg-emerald-500/20 rounded-lg flex items-center justify-center mb-4">
-                            <svg class="w-7 h-7 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        </div>
-                        <h3 class="text-xl font-bold">Forward & Backward Scrubbing</h3>
-                    </div>
-                    <p class="text-slate-400 leading-relaxed">Move through time in both directions. Browse what happened, what you typed, what files changed. Temporal navigation is as natural as scrolling.</p>
-                </div>
-
-                <!-- Feature 5 -->
-                <div class="feature-card p-8 rounded-xl">
-                    <div class="mb-6">
-                        <div class="w-14 h-14 bg-blue-500/20 rounded-lg flex items-center justify-center mb-4">
-                            <svg class="w-7 h-7 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
-                        </div>
-                        <h3 class="text-xl font-bold">Temporal Diffs & Analytics</h3>
-                    </div>
-                    <p class="text-slate-400 leading-relaxed">See exactly what changed between any two moments. File diffs, productivity heatmaps, keystroke analysis. Understand your workflow like never before.</p>
-                </div>
-
-                <!-- Feature 6 -->
-                <div class="feature-card p-8 rounded-xl">
-                    <div class="mb-6">
-                        <div class="w-14 h-14 bg-orange-500/20 rounded-lg flex items-center justify-center mb-4">
-                            <svg class="w-7 h-7 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                        </div>
-                        <h3 class="text-xl font-bold">Zero Data Leakage</h3>
-                    </div>
-                    <p class="text-slate-400 leading-relaxed">Everything stays on your machine. No cloud uploads, no external servers. Temporal computing without the privacy tradeoff. Your history, your control.</p>
-                </div>
+                <p class="text-sm text-slate-400">
+                    Made in America • Zero Data Retention • Open Source • Cross-Platform
+                </p>
             </div>
 
-            <!-- Key Claims Section -->
-            <div class="bg-gradient-to-r from-slate-900/50 to-slate-800/50 border border-slate-700 rounded-2xl p-12 text-center">
-                <h3 class="text-2xl font-bold mb-8">Groundbreaking Context Evaluation</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div>
-                        <p class="text-4xl font-bold gradient-text mb-2">168 Hours</p>
-                        <p class="text-slate-400">Full week of temporal history</p>
-                    </div>
-                    <div>
-                        <p class="text-4xl font-bold gradient-text-purple mb-2">15 Min</p>
-                        <p class="text-slate-400">Snapshot intervals for context</p>
-                    </div>
-                    <div>
-                        <p class="text-4xl font-bold gradient-text mb-2">∞ Moments</p>
-                        <p class="text-slate-400">Browse backward and forward</p>
+            <!-- Visual Demo -->
+            <div class="mt-20 relative">
+                <div class="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-2xl blur-2xl -z-10"></div>
+                <div class="bg-slate-900/60 border border-slate-700/50 rounded-2xl p-8 backdrop-blur-sm">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Left: Timeline showcase -->
+                        <div class="space-y-4">
+                            <h3 class="text-cyan-400 font-mono text-sm font-bold uppercase tracking-wider">Temporal Timeline</h3>
+                            <div class="space-y-3">
+                                <div class="p-4 bg-slate-800/50 rounded-lg border-l-4 border-cyan-500 hover:bg-slate-800 transition cursor-pointer">
+                                    <p class="text-cyan-300 font-semibold text-sm">Today 14:32</p>
+                                    <p class="text-slate-400 text-xs">Project updated, meeting notes saved</p>
+                                </div>
+                                <div class="p-4 bg-slate-800/30 rounded-lg border-l-4 border-slate-600 hover:bg-slate-800 transition cursor-pointer">
+                                    <p class="text-slate-300 font-semibold text-sm">2 days ago 09:15</p>
+                                    <p class="text-slate-400 text-xs">Presentation delivered, feedback logged</p>
+                                </div>
+                                <div class="p-4 bg-slate-800/30 rounded-lg border-l-4 border-slate-600 hover:bg-slate-800 transition cursor-pointer">
+                                    <p class="text-slate-300 font-semibold text-sm">1 week ago 16:45</p>
+                                    <p class="text-slate-400 text-xs">Project initiated, first commit made</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Key features -->
+                        <div class="space-y-4">
+                            <h3 class="text-purple-400 font-mono text-sm font-bold uppercase tracking-wider">Your Superpowers</h3>
+                            <div class="space-y-3">
+                                <div class="p-4 bg-slate-800/50 rounded-lg border-l-4 border-purple-500">
+                                    <p class="font-semibold text-sm">⏮ Perfect Rewind</p>
+                                    <p class="text-slate-400 text-xs">5-minute reversal via proprietary NEMO Code</p>
+                                </div>
+                                <div class="p-4 bg-slate-800/50 rounded-lg border-l-4 border-purple-500">
+                                    <p class="font-semibold text-sm">🧠 Groundbreaking Context</p>
+                                    <p class="text-slate-400 text-xs">Complete state captured: screenshots, keystrokes, files</p>
+                                </div>
+                                <div class="p-4 bg-slate-800/50 rounded-lg border-l-4 border-purple-500">
+                                    <p class="font-semibold text-sm">🔐 Data Invisible</p>
+                                    <p class="text-slate-400 text-xs">Zero keystroke storage, guaranteed by architecture</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 
-    <!-- TAB: ROADMAP -->
-    <div id="roadmap" class="tab-content py-20">
-        <div class="max-w-4xl mx-auto px-6">
-            <h2 class="text-4xl font-bold mb-16 text-center tracking-tight">Temporal <span class="gradient-text">Roadmap</span></h2>
-            
-            <div class="space-y-8">
-                <!-- v1.0 -->
-                <div class="timeline-item">
-                    <div class="bg-slate-900/50 border border-cyan-500/30 p-8 rounded-xl">
-                        <div class="flex justify-between items-start mb-4">
-                            <div>
-                                <h3 class="text-2xl font-bold text-cyan-400">v1.0 - Desktop Rewind</h3>
-                                <p class="text-slate-400 text-sm">NOW - Live Beta</p>
+    <!-- Features Section -->
+    <section id="features" class="py-20 px-6 bg-slate-950/50">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4">
+                    Nemo Redefines the Keyboard in <span class="gradient-text-purple">4 Revolutionary Ways</span>
+                </h2>
+                <p class="text-xl text-slate-400">4 Keys + 2 Directions + 1 Keyboard + 1 Vision</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Key 1 -->
+                <div class="bg-slate-900/40 border border-cyan-500/30 rounded-xl p-8 hover:border-cyan-400 transition">
+                    <div class="w-12 h-12 bg-gradient-cyan rounded-lg flex items-center justify-center mb-4 text-xl">⌨️</div>
+                    <h3 class="text-xl font-bold mb-2">RIGHT SHIFT</h3>
+                    <p class="text-slate-300">Voice input with Internet A.I. powered synthesis. Speak your commands with full desktop context.</p>
+                </div>
+
+                <!-- Key 2 -->
+                <div class="bg-slate-900/40 border border-purple-500/30 rounded-xl p-8 hover:border-purple-400 transition">
+                    <div class="w-12 h-12 bg-gradient-purple rounded-lg flex items-center justify-center mb-4 text-xl">🧠</div>
+                    <h3 class="text-xl font-bold mb-2">RIGHT ALT</h3>
+                    <p class="text-slate-300">Groundbreaking context evaluation. A.I. understands your complete workflow, not just individual actions.</p>
+                </div>
+
+                <!-- Direction 1 -->
+                <div class="bg-slate-900/40 border border-cyan-500/30 rounded-xl p-8 hover:border-cyan-400 transition">
+                    <div class="w-12 h-12 bg-gradient-cyan rounded-lg flex items-center justify-center mb-4 text-xl">⏮</div>
+                    <h3 class="text-xl font-bold mb-2">RIGHT ALT + LEFT</h3>
+                    <p class="text-slate-300">Temporal Rewind. Perfect 5-minute reversal via proprietary NEMO Code. Action-by-action restoration.</p>
+                </div>
+
+                <!-- Direction 2 -->
+                <div class="bg-slate-900/40 border border-purple-500/30 rounded-xl p-8 hover:border-purple-400 transition">
+                    <div class="w-12 h-12 bg-gradient-purple rounded-lg flex items-center justify-center mb-4 text-xl">⏭</div>
+                    <h3 class="text-xl font-bold mb-2">RIGHT ALT + RIGHT</h3>
+                    <p class="text-slate-300">Temporal Forward. Reinforced Learning Agent predicts next actions based on your patterns.</p>
+                </div>
+            </div>
+
+            <!-- Core Capabilities -->
+            <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="p-6 bg-slate-900/30 rounded-lg border border-slate-700/50">
+                    <h4 class="font-bold mb-2">Four-Button Control Interface</h4>
+                    <p class="text-slate-400 text-sm">Minimal, elegant, revolutionary. Everything you need at your fingertips.</p>
+                </div>
+                <div class="p-6 bg-slate-900/30 rounded-lg border border-slate-700/50">
+                    <h4 class="font-bold mb-2">Text-to-Speech Voice Input</h4>
+                    <p class="text-slate-400 text-sm">Natural voice commands with full context awareness and synthesis.</p>
+                </div>
+                <div class="p-6 bg-slate-900/30 rounded-lg border border-slate-700/50">
+                    <h4 class="font-bold mb-2">Real-Time Processing</h4>
+                    <p class="text-slate-400 text-sm">Sub-50ms latency. Lightning-fast temporal navigation and reversal.</p>
+                </div>
+                <div class="p-6 bg-slate-900/30 rounded-lg border border-slate-700/50">
+                    <h4 class="font-bold mb-2">Military-Grade Encryption</h4>
+                    <p class="text-slate-400 text-sm">AES-256 encryption. Your temporal data stays encrypted and local.</p>
+                </div>
+                <div class="p-6 bg-slate-900/30 rounded-lg border border-slate-700/50">
+                    <h4 class="font-bold mb-2">Zero Data Retention</h4>
+                    <p class="text-slate-400 text-sm">Guaranteed by architecture, not policy. Keystrokes never stored.</p>
+                </div>
+                <div class="p-6 bg-slate-900/30 rounded-lg border border-slate-700/50">
+                    <h4 class="font-bold mb-2">Cross-Platform Compatible</h4>
+                    <p class="text-slate-400 text-sm">Windows, macOS, Linux, iOS, Android. Temporal computing everywhere.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technology Section -->
+    <section id="technology" class="py-20 px-6">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4">
+                    Powered by Proprietary <span class="gradient-text-cyan">NEMO Code</span>
+                </h2>
+                <p class="text-xl text-slate-400">The locked mechanism that powers perfect temporal reversal</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="space-y-6">
+                    <div class="p-6 bg-slate-900/40 rounded-lg border border-cyan-500/20">
+                        <h3 class="font-bold text-lg mb-2 text-cyan-400">Groundbreaking Context Evaluation</h3>
+                        <p class="text-slate-300">NEMO Code enables complete context preservation. Every action captures: screenshots, keystrokes, file state, app context, and behavioral patterns.</p>
+                    </div>
+                    <div class="p-6 bg-slate-900/40 rounded-lg border border-cyan-500/20">
+                        <h3 class="font-bold text-lg mb-2 text-cyan-400">Perfect Temporal Reversal</h3>
+                        <p class="text-slate-300">NEMO Code translates actions to reversible instructions. Hold ALT+LEFT and watch perfect 5-minute reversal unfold action-by-action.</p>
+                    </div>
+                    <div class="p-6 bg-slate-900/40 rounded-lg border border-cyan-500/20">
+                        <h3 class="font-bold text-lg mb-2 text-cyan-400">Reinforced Learning Agent</h3>
+                        <p class="text-slate-300">NEMO Code learns YOUR workflow locally. Improves 5-10% daily. Zero keystroke data stored. Only patterns retained.</p>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900/60 border border-slate-700/50 rounded-xl p-8 space-y-6">
+                    <div class="space-y-4">
+                        <h3 class="text-cyan-400 font-mono text-sm font-bold uppercase tracking-wider">How NEMO Code Works</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-start space-x-4">
+                                <div class="w-8 h-8 bg-gradient-cyan rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">1</div>
+                                <div>
+                                    <p class="font-semibold">Action Translation</p>
+                                    <p class="text-sm text-slate-400">Every keystroke/action → NEMO Code instruction</p>
+                                </div>
                             </div>
-                            <span class="px-3 py-1 bg-cyan-500/20 text-cyan-400 text-xs font-bold rounded-full">LIVE</span>
+                            <div class="flex items-start space-x-4">
+                                <div class="w-8 h-8 bg-gradient-cyan rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">2</div>
+                                <div>
+                                    <p class="font-semibold">Stack Building</p>
+                                    <p class="text-sm text-slate-400">Reverse instruction added to LIFO stack (~3KB per 15min)</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-4">
+                                <div class="w-8 h-8 bg-gradient-cyan rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">3</div>
+                                <div>
+                                    <p class="font-semibold">Perfect Reversal</p>
+                                    <p class="text-sm text-slate-400">Rewind: stack traversed backward, reversals executed</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-4">
+                                <div class="w-8 h-8 bg-gradient-cyan rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">4</div>
+                                <div>
+                                    <p class="font-semibold">Local Learning</p>
+                                    <p class="text-sm text-slate-400">RL agent learns patterns (no keystroke data persisted)</p>
+                                </div>
+                            </div>
                         </div>
-                        <ul class="space-y-2 text-slate-300 text-sm">
-                            <li>✅ 5-minute keystroke reversal</li>
-                            <li>✅ Full context capture</li>
-                            <li>✅ System integration ready</li>
-                            <li>✅ Zero data persistence model</li>
-                        </ul>
+                    </div>
+
+                    <div class="pt-6 border-t border-slate-700/50">
+                        <p class="text-sm text-slate-400">
+                            <span class="font-bold text-cyan-400">NEMO Code is proprietary.</span> Users experience perfect reversal. Competitors can't reverse-engineer it. That's the point.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Roadmap Section -->
+    <section id="roadmap" class="py-20 px-6 bg-slate-950/50">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4">
+                    Path to Temporal Computing <span class="gradient-text-purple">Standard</span>
+                </h2>
+                <p class="text-xl text-slate-400">From v1.0 foundation to industry adoption</p>
+            </div>
+
+            <div class="space-y-6">
+                <!-- v1.0 -->
+                <div class="flex gap-8 items-start">
+                    <div class="flex-shrink-0">
+                        <div class="w-16 h-16 bg-gradient-cyan rounded-full flex items-center justify-center text-2xl font-bold">1.0</div>
+                    </div>
+                    <div class="flex-grow bg-slate-900/40 border border-cyan-500/30 rounded-lg p-6">
+                        <h3 class="text-xl font-bold mb-2">NOW - Foundation</h3>
+                        <p class="text-slate-300 mb-3">Perfect 5-minute rewind, 4 hotkeys, RL agent foundation, zero data retention</p>
+                        <span class="inline-block px-3 py-1 bg-cyan-500/20 text-cyan-300 rounded-full text-sm">Status: Live Beta</span>
                     </div>
                 </div>
 
                 <!-- v1.5 -->
-                <div class="timeline-item">
-                    <div class="bg-slate-900/50 border border-purple-500/30 p-8 rounded-xl">
-                        <div class="flex justify-between items-start mb-4">
-                            <div>
-                                <h3 class="text-2xl font-bold text-purple-400">v1.5 - Keystroke Perfection</h3>
-                                <p class="text-slate-400 text-sm">Q1 2026 - Feb/Mar</p>
-                            </div>
-                            <span class="px-3 py-1 bg-purple-500/20 text-purple-400 text-xs font-bold rounded-full">SOON</span>
-                        </div>
-                        <ul class="space-y-2 text-slate-300 text-sm">
-                            <li>🔹 Shift combinations (shift+a, ctrl+v)</li>
-                            <li>🔹 Caps Lock state tracking</li>
-                            <li>🔹 Complex multi-key sequences</li>
-                            <li>🔹 Latency optimization (&lt;20ms)</li>
-                        </ul>
+                <div class="flex gap-8 items-start">
+                    <div class="flex-shrink-0">
+                        <div class="w-16 h-16 bg-slate-700 rounded-full flex items-center justify-center text-2xl font-bold opacity-50">1.5</div>
+                    </div>
+                    <div class="flex-grow bg-slate-900/20 border border-slate-700/30 rounded-lg p-6 opacity-75">
+                        <h3 class="text-xl font-bold mb-2">Q1 2026 - Stability</h3>
+                        <p class="text-slate-300 mb-3">Edge cases, performance optimization, community bug fixes</p>
+                        <span class="inline-block px-3 py-1 bg-slate-600/20 text-slate-400 rounded-full text-sm">Status: Building</span>
                     </div>
                 </div>
 
                 <!-- v2.0 -->
-                <div class="timeline-item">
-                    <div class="bg-slate-900/50 border border-cyan-500/30 p-8 rounded-xl">
-                        <div class="flex justify-between items-start mb-4">
-                            <div>
-                                <h3 class="text-2xl font-bold text-cyan-400">v2.0 - TimeVault Snapshots</h3>
-                                <p class="text-slate-400 text-sm">Q2 2026 - Apr/May</p>
-                            </div>
-                            <span class="px-3 py-1 bg-cyan-500/20 text-cyan-400 text-xs font-bold rounded-full">BUILDING</span>
-                        </div>
-                        <ul class="space-y-2 text-slate-300 text-sm">
-                            <li>📸 15-minute temporal snapshots</li>
-                            <li>📁 Git-like versioning system</li>
-                            <li>🔍 File state tracking (diffs)</li>
-                            <li>💾 ~2MB/day storage footprint</li>
-                        </ul>
+                <div class="flex gap-8 items-start">
+                    <div class="flex-shrink-0">
+                        <div class="w-16 h-16 bg-slate-700 rounded-full flex items-center justify-center text-2xl font-bold opacity-50">2.0</div>
+                    </div>
+                    <div class="flex-grow bg-slate-900/20 border border-slate-700/30 rounded-lg p-6 opacity-75">
+                        <h3 class="text-xl font-bold mb-2">Q2 2026 - Extended Memory</h3>
+                        <p class="text-slate-300 mb-3">15-minute snapshots, 2-hour history, git-like versioning</p>
+                        <span class="inline-block px-3 py-1 bg-slate-600/20 text-slate-400 rounded-full text-sm">Status: Planned</span>
                     </div>
                 </div>
 
                 <!-- v2.5 -->
-                <div class="timeline-item">
-                    <div class="bg-slate-900/50 border border-pink-500/30 p-8 rounded-xl">
-                        <div class="flex justify-between items-start mb-4">
-                            <div>
-                                <h3 class="text-2xl font-bold text-pink-400">v2.5 - Timeline Viewer</h3>
-                                <p class="text-slate-400 text-sm">Q2/Q3 2026 - May/Jun</p>
-                            </div>
-                            <span class="px-3 py-1 bg-pink-500/20 text-pink-400 text-xs font-bold rounded-full">PLANNED</span>
-                        </div>
-                        <ul class="space-y-2 text-slate-300 text-sm">
-                            <li>🎬 Netflix-style timeline UI</li>
-                            <li>🎥 Smooth scrubbing (forward/backward)</li>
-                            <li>👁️ Moment preview on hover</li>
-                            <li>🏷️ Tagging & bookmarking</li>
-                        </ul>
+                <div class="flex gap-8 items-start">
+                    <div class="flex-shrink-0">
+                        <div class="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center text-2xl font-bold">2.5</div>
+                    </div>
+                    <div class="flex-grow bg-purple-900/30 border border-purple-500/50 rounded-lg p-6 ring-2 ring-purple-500/20">
+                        <h3 class="text-xl font-bold mb-2 text-purple-300">🎬 Q2-Q3 2026 - Netflix UI (Inflection Point)</h3>
+                        <p class="text-slate-300 mb-3">Timeline scrubbing interface, moment previews, Netflix-style temporal browsing</p>
+                        <span class="inline-block px-3 py-1 bg-purple-500/30 text-purple-300 rounded-full text-sm font-bold">Status: Game Changer</span>
                     </div>
                 </div>
 
                 <!-- v3.0 -->
-                <div class="timeline-item">
-                    <div class="bg-slate-900/50 border border-emerald-500/30 p-8 rounded-xl">
-                        <div class="flex justify-between items-start mb-4">
-                            <div>
-                                <h3 class="text-2xl font-bold text-emerald-400">v3.0 - Full Week Coverage</h3>
-                                <p class="text-slate-400 text-sm">Q3 2026 - Jul/Aug</p>
-                            </div>
-                            <span class="px-3 py-1 bg-emerald-500/20 text-emerald-400 text-xs font-bold rounded-full">ROADMAP</span>
-                        </div>
-                        <ul class="space-y-2 text-slate-300 text-sm">
-                            <li>📅 Full 7-day temporal window</li>
-                            <li>🔄 Desktop state restoration</li>
-                            <li>🔍 OCR-based screenshot search</li>
-                            <li>📊 Productivity analytics</li>
-                        </ul>
+                <div class="flex gap-8 items-start">
+                    <div class="flex-shrink-0">
+                        <div class="w-16 h-16 bg-slate-700 rounded-full flex items-center justify-center text-2xl font-bold opacity-50">3.0</div>
+                    </div>
+                    <div class="flex-grow bg-slate-900/20 border border-slate-700/30 rounded-lg p-6 opacity-75">
+                        <h3 class="text-xl font-bold mb-2">Q3 2026 - Full Week Coverage</h3>
+                        <p class="text-slate-300 mb-3">7-day temporal window, desktop restoration, OCR search</p>
+                        <span class="inline-block px-3 py-1 bg-slate-600/20 text-slate-400 rounded-full text-sm">Status: Planned</span>
                     </div>
                 </div>
 
-                <!-- v3.5 -->
-                <div class="timeline-item">
-                    <div class="bg-slate-900/50 border border-blue-500/30 p-8 rounded-xl">
-                        <div class="flex justify-between items-start mb-4">
-                            <div>
-                                <h3 class="text-2xl font-bold text-blue-400">v3.5 - Web Interface</h3>
-                                <p class="text-slate-400 text-sm">Q3/Q4 2026 - Aug/Sep</p>
-                            </div>
-                            <span class="px-3 py-1 bg-blue-500/20 text-blue-400 text-xs font-bold rounded-full">PLANNED</span>
-                        </div>
-                        <ul class="space-y-2 text-slate-300 text-sm">
-                            <li>🌐 Beautiful web UI for browsing</li>
-                            <li>📱 Responsive design (any device)</li>
-                            <li>🎨 Advanced visualization tools</li>
-                            <li>⚡ Real-time timeline updates</li>
-                        </ul>
+                <!-- v5.0+ -->
+                <div class="flex gap-8 items-start">
+                    <div class="flex-shrink-0">
+                        <div class="w-16 h-16 bg-cyan-600 rounded-full flex items-center justify-center text-2xl font-bold">5+</div>
+                    </div>
+                    <div class="flex-grow bg-slate-900/40 border border-cyan-500/30 rounded-lg p-6">
+                        <h3 class="text-xl font-bold mb-2">2027+ - Industry Standard</h3>
+                        <p class="text-slate-300 mb-3">Temporal computing becomes OS standard. Mobile integration, enterprise adoption.</p>
+                        <span class="inline-block px-3 py-1 bg-cyan-500/20 text-cyan-300 rounded-full text-sm">Status: Vision</span>
                     </div>
                 </div>
-
-                <!-- v4.0 -->
-                <div class="timeline-item">
-                    <div class="bg-slate-900/50 border border-orange-500/30 p-8 rounded-xl">
-                        <div class="flex justify-between items-start mb-4">
-                            <div>
-                                <h3 class="text-2xl font-bold text-orange-400">v4.0 - Mobile OS Integration</h3>
-                                <p class="text-slate-400 text-sm">Q4 2026 - Oct/Nov</p>
-                            </div>
-                            <span class="px-3 py-1 bg-orange-500/20 text-orange-400 text-xs font-bold rounded-full">FUTURE</span>
-                        </div>
-                        <ul class="space-y-2 text-slate-300 text-sm">
-                            <li>📱 iOS/Android temporal support</li>
-                            <li>🔄 Cross-platform sync</li>
-                            <li>👆 Gesture-based temporal navigation</li>
-                            <li>🔐 Encrypted cloud backup (optional)</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- v5.0 -->
-                <div class="timeline-item">
-                    <div class="bg-gradient-to-r from-slate-900/50 to-slate-800/50 border border-slate-700 p-8 rounded-xl">
-                        <div class="flex justify-between items-start mb-4">
-                            <div>
-                                <h3 class="text-2xl font-bold text-slate-300">v5.0+ - Temporal OS Era</h3>
-                                <p class="text-slate-400 text-sm">2027+ - Industry Standard</p>
-                            </div>
-                            <span class="px-3 py-1 bg-slate-600/30 text-slate-300 text-xs font-bold rounded-full">VISION</span>
-                        </div>
-                        <ul class="space-y-2 text-slate-300 text-sm">
-                            <li>🌍 Enterprise deployment</li>
-                            <li>👥 Team collaboration features</li>
-                            <li>🔌 Third-party integrations</li>
-                            <li>🎯 Industry standard adoption</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <div class="mt-16 text-center p-8 bg-slate-900/50 border border-slate-800 rounded-xl">
-                <p class="text-slate-400 text-lg mb-2">🎬 <strong>Netflix-Style Temporal Browsing</strong></p>
-                <p class="text-slate-500">Full implementation by <strong>Q3 2026</strong> (May-August)</p>
             </div>
         </div>
-    </div>
+    </section>
 
-    <!-- TAB: TECHNICAL/VISION -->
-    <div id="technical" class="tab-content py-20">
-        <div class="max-w-4xl mx-auto px-6">
-            <h2 class="text-4xl font-bold mb-12 text-center tracking-tight">Temporal Computing <span class="gradient-text">Vision</span></h2>
+    <!-- Why Nemo Section -->
+    <section class="py-20 px-6">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4">Why Nemo is Different</h2>
+                <p class="text-xl text-slate-400">The only temporal git powered by proprietary NEMO Code</p>
+            </div>
 
-            <div class="space-y-8">
-                <!-- What is Temporal Git -->
-                <div class="bg-slate-900/50 border border-slate-800 rounded-xl p-8">
-                    <h3 class="text-2xl font-bold mb-4 text-cyan-400">What is a Temporal Git?</h3>
-                    <p class="text-slate-300 mb-4 leading-relaxed">
-                        Traditional git tracks <strong>code changes</strong>. Temporal Git tracks <strong>your entire life</strong>.
-                    </p>
-                    <p class="text-slate-300 mb-4 leading-relaxed">
-                        Every 15 minutes, Nemo creates a "commit" of your desktop state:
-                    </p>
-                    <ul class="space-y-2 text-slate-300 mb-6">
-                        <li>📸 Screenshot captured</li>
-                        <li>⌨️ All keystrokes recorded (reversal-ready)</li>
-                        <li>📁 File state snapshots (diffs)</li>
-                        <li>🪟 Apps open + metadata</li>
-                    </ul>
-                    <p class="text-slate-400 italic">
-                        Then? You browse like Netflix. Jump to any moment. See what happened. Restore if needed.
-                    </p>
-                </div>
-
-                <!-- Full Context -->
-                <div class="bg-slate-900/50 border border-slate-800 rounded-xl p-8">
-                    <h3 class="text-2xl font-bold mb-4 text-purple-400">Full Context Preservation</h3>
-                    <div class="bg-slate-800/30 p-6 rounded-lg mb-6 border border-slate-700">
-                        <p class="text-sm text-slate-400 font-mono mb-4">Example: "What was I working on 3 days ago at 14:32?"</p>
-                        <p class="text-slate-300">Nemo knows:</p>
-                        <ul class="space-y-2 text-slate-400 text-sm mt-4">
-                            <li>✓ What app was open (IDE, browser, email)</li>
-                            <li>✓ What files were visible</li>
-                            <li>✓ What you typed (keystroke log)</li>
-                            <li>✓ What was on your screen (screenshot)</li>
-                            <li>✓ What changed since (file diffs)</li>
-                        </ul>
-                    </div>
-                    <p class="text-slate-300">
-                        This isn't undo. This is <strong>full temporal restoration</strong>. Your entire desktop context is preserved and retrievable.
-                    </p>
-                </div>
-
-                <!-- Week-Long History -->
-                <div class="bg-slate-900/50 border border-slate-800 rounded-xl p-8">
-                    <h3 class="text-2xl font-bold mb-4 text-emerald-400">One Week of History</h3>
-                    <div class="grid grid-cols-2 gap-4 mb-6">
-                        <div class="bg-slate-800/30 p-4 rounded-lg">
-                            <p class="text-xs text-slate-500 uppercase font-bold mb-2">Storage Per Day</p>
-                            <p class="text-2xl font-bold text-emerald-400">~2 MB</p>
-                        </div>
-                        <div class="bg-slate-800/30 p-4 rounded-lg">
-                            <p class="text-xs text-slate-500 uppercase font-bold mb-2">Full Week</p>
-                            <p class="text-2xl font-bold text-emerald-400">~14 MB</p>
-                        </div>
-                        <div class="bg-slate-800/30 p-4 rounded-lg">
-                            <p class="text-xs text-slate-500 uppercase font-bold mb-2">Snapshots/Day</p>
-                            <p class="text-2xl font-bold text-emerald-400">96 Commits</p>
-                        </div>
-                        <div class="bg-slate-800/30 p-4 rounded-lg">
-                            <p class="text-xs text-slate-500 uppercase font-bold mb-2">Interval</p>
-                            <p class="text-2xl font-bold text-emerald-400">15 Min</p>
-                        </div>
-                    </div>
-                    <p class="text-slate-300">
-                        Efficient compression means your entire week fits in ~14MB. Auto-purge after 2 weeks (configurable). Always recent history, always available.
-                    </p>
-                </div>
-
-                <!-- Forward & Backward -->
-                <div class="bg-slate-900/50 border border-slate-800 rounded-xl p-8">
-                    <h3 class="text-2xl font-bold mb-4 text-pink-400">Forward & Backward Scrubbing</h3>
-                    <p class="text-slate-300 mb-4">
-                        Unlike traditional undo (backward only), Nemo lets you scrub in <strong>both directions through time</strong>.
-                    </p>
-                    <div class="space-y-4">
-                        <div class="bg-slate-800/30 p-4 rounded-lg border-l-4 border-pink-500">
-                            <p class="text-pink-400 font-bold mb-2">⏮️ Backward Scrubbing</p>
-                            <p class="text-slate-300 text-sm">Go back 6 hours. What was I working on? What changed? Restore any file.</p>
-                        </div>
-                        <div class="bg-slate-800/30 p-4 rounded-lg border-l-4 border-cyan-500">
-                            <p class="text-cyan-400 font-bold mb-2">⏭️ Forward Scrubbing</p>
-                            <p class="text-slate-300 text-sm">Skip forward 2 hours. See the progression. Understand how things evolved. Learn your workflow.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Data Privacy -->
-                <div class="bg-slate-900/50 border border-slate-800 rounded-xl p-8">
-                    <h3 class="text-2xl font-bold mb-4 text-blue-400">Zero Data Leakage</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="space-y-4">
+                    <h3 class="text-2xl font-bold text-red-400 line-through">❌ Before Nemo</h3>
                     <ul class="space-y-3 text-slate-300">
-                        <li class="flex items-start">
-                            <span class="text-blue-500 mr-3 font-bold">✓</span>
-                            <span><strong>Local First:</strong> All temporal data stored on your machine only.</span>
+                        <li class="flex items-start space-x-3">
+                            <span class="text-red-400 mt-1">•</span>
+                            <span>"I accidentally deleted something and it's gone forever"</span>
                         </li>
-                        <li class="flex items-start">
-                            <span class="text-blue-500 mr-3 font-bold">✓</span>
-                            <span><strong>No Cloud:</strong> Optional encrypted backup (user choice, encrypted locally).</span>
+                        <li class="flex items-start space-x-3">
+                            <span class="text-red-400 mt-1">•</span>
+                            <span>"I can't remember what I was doing 3 days ago"</span>
                         </li>
-                        <li class="flex items-start">
-                            <span class="text-blue-500 mr-3 font-bold">✓</span>
-                            <span><strong>No Telemetry:</strong> We don't know what you do, when you do it, or what you change.</span>
+                        <li class="flex items-start space-x-3">
+                            <span class="text-red-400 mt-1">•</span>
+                            <span>"One mistake and all context is lost"</span>
                         </li>
-                        <li class="flex items-start">
-                            <span class="text-blue-500 mr-3 font-bold">✓</span>
-                            <span><strong>Full Control:</strong> Delete any snapshot, disable capture, opt-out anytime.</span>
+                        <li class="flex items-start space-x-3">
+                            <span class="text-red-400 mt-1">•</span>
+                            <span>"I don't trust A.I. with my personal data"</span>
                         </li>
                     </ul>
                 </div>
 
-                <!-- The Paradigm Shift -->
-                <div class="bg-gradient-to-r from-slate-900/70 to-slate-800/70 border border-slate-700 rounded-xl p-8">
-                    <h3 class="text-2xl font-bold mb-4 text-slate-100">The Paradigm Shift</h3>
-                    <div class="space-y-4">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-slate-400 text-sm uppercase font-bold mb-1">Without Nemo</p>
-                                <p class="text-slate-300">"I need to be careful. One mistake and it's gone."</p>
-                            </div>
-                            <span class="text-2xl">😰</span>
-                        </div>
-                        <div class="text-center text-slate-500">→</div>
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-slate-400 text-sm uppercase font-bold mb-1">With Nemo</p>
-                                <p class="text-slate-300">"Everything is captured. I can always go back."</p>
-                            </div>
-                            <span class="text-2xl">🚀</span>
-                        </div>
-                    </div>
+                <div class="space-y-4">
+                    <h3 class="text-2xl font-bold text-green-400">✅ With Nemo</h3>
+                    <ul class="space-y-3 text-slate-300">
+                        <li class="flex items-start space-x-3">
+                            <span class="text-green-400 mt-1">•</span>
+                            <span>"Hold ALT+LEFT and perfect reversal happens"</span>
+                        </li>
+                        <li class="flex items-start space-x-3">
+                            <span class="text-green-400 mt-1">•</span>
+                            <span>"Jump to any moment with full desktop context"</span>
+                        </li>
+                        <li class="flex items-start space-x-3">
+                            <span class="text-green-400 mt-1">•</span>
+                            <span>"Complete history captured, always recoverable"</span>
+                        </li>
+                        <li class="flex items-start space-x-3">
+                            <span class="text-green-400 mt-1">•</span>
+                            <span>"Your data stays local, learning happens privately"</span>
+                        </li>
+                    </ul>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <footer class="py-12 border-t border-slate-800 text-center text-slate-500">
-        <p>&copy; 2026 Project Nemo. Temporal Computing Revolution.</p>
-        <p class="text-xs mt-2">Rewind. Browse. Restore. Live without fear.</p>
+            <div class="mt-16 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-500/30 rounded-xl p-8 text-center">
+                <h3 class="text-2xl font-bold mb-4">The Promise</h3>
+                <p class="text-lg text-slate-300 mb-2">
+                    "Everything is captured. I can always go back. My machine learns from me, not about me."
+                </p>
+                <p class="text-sm text-slate-400">— That's temporal computing. That's Nemo.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 px-6 bg-slate-950/50">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-4xl md:text-5xl font-bold mb-6">Ready to Experience Temporal Computing?</h2>
+            <p class="text-xl text-slate-300 mb-10">Download v1.0 Beta and join the temporal revolution</p>
+            
+            <div class="flex flex-col sm:flex-row justify-center gap-4 mb-12">
+                <button class="px-8 py-4 bg-gradient-cyan text-white font-bold rounded-lg hover:shadow-xl hover:shadow-cyan-500/50 transition-all transform hover:scale-105">
+                    Download Beta Now
+                </button>
+                <a href="https://github.com/torresjchristopher/Nemo" target="_blank" class="px-8 py-4 border-2 border-cyan-400 text-cyan-300 font-bold rounded-lg hover:bg-cyan-400/10 transition-all">
+                    View GitHub Repo
+                </a>
+            </div>
+
+            <p class="text-slate-500">
+                v1.0 Beta • Made in America • Zero Data Retention • <a href="https://github.com/torresjchristopher/Nemo" target="_blank" class="text-cyan-400 hover:underline">Open Source</a>
+            </p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800 py-12 px-6 bg-slate-950/80">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <div class="text-lg font-bold gradient-text-cyan mb-4">NEMO</div>
+                    <p class="text-slate-400 text-sm">Temporal Git with Groundbreaking Context Evaluation</p>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Product</h4>
+                    <ul class="space-y-2 text-slate-400 text-sm">
+                        <li><a href="#features" class="hover:text-cyan-400 transition">Features</a></li>
+                        <li><a href="#roadmap" class="hover:text-cyan-400 transition">Roadmap</a></li>
+                        <li><a href="https://github.com/torresjchristopher/Nemo" target="_blank" class="hover:text-cyan-400 transition">GitHub</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Resources</h4>
+                    <ul class="space-y-2 text-slate-400 text-sm">
+                        <li><a href="https://github.com/torresjchristopher/Nemo" target="_blank" class="hover:text-cyan-400 transition">Documentation</a></li>
+                        <li><a href="https://github.com/torresjchristopher/Nemo/issues" target="_blank" class="hover:text-cyan-400 transition">Report Issue</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Legal</h4>
+                    <ul class="space-y-2 text-slate-400 text-sm">
+                        <li><a href="#" class="hover:text-cyan-400 transition">Privacy</a></li>
+                        <li><a href="#" class="hover:text-cyan-400 transition">Terms</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-slate-700/50 pt-8 text-center text-slate-500 text-sm">
+                <p>© 2026 Nemo. Made in America. All rights reserved.</p>
+            </div>
+        </div>
     </footer>
 
     <script>
-        function showTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.remove('active');
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
             });
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.classList.remove('active');
+        });
+
+        // Add scroll animation for elements
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
             });
-            document.getElementById(tabId).classList.add('active');
-            document.getElementById('nav-' + tabId).classList.add('active');
-            window.scrollTo(0, 0);
-        }
+        }, observerOptions);
+
+        document.querySelectorAll('section > div, .grid > div').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(el);
+        });
     </script>
 </body>
 </html>
