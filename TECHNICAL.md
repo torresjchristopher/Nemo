@@ -1,5 +1,19 @@
 # Nemo Technical Specifications
 
+## ⚠️ NEMO Code: Proprietary Core (Locked)
+
+Perfect temporal reversal (5-minute rewind) is powered by **NEMO Code**, a proprietary instruction set that is:
+
+- ✅ **Proprietary** - Not open-source, never disclosed
+- ✅ **Locked** - Core algorithm stays secret
+- ✅ **Unreplicable** - Can't be reverse-engineered from outside
+- ✅ **Focused** - Powers flawless action reversal
+- ✅ **Transparent to users** - Perfect rewind that works
+
+What users get: Perfect reversal. What competitors get: No blueprint to copy. That's the point.
+
+---
+
 ## 🏗️ Architecture Overview
 
 Nemo is built on a modular, extensible temporal architecture:

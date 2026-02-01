@@ -19,26 +19,26 @@ python -m nemo.cli.main
 ```
 
 **What you get:**
-- ✅ 5-minute temporal rewind (v1.0 NOW)
-- 🔄 Weekly/bi-weekly updates (continuous evolution)
-- 🎯 Community-guided features (you shape direction)
-- 🎬 March toward Netflix UI (Q2-Q3 2026, community-validated)
+- ✅ 5-minute perfect rewind via proprietary **NEMO Code**
+- 🔄 Frequent patches with detailed release notes
+- 🎯 Bug fixes driven by user reports
+- 🎬 March toward Netflix UI (Q2-Q3 2026)
 - 📅 Full week coverage (target Q3 2026)
 
-## 🎬 The Continuous Beta Model
+## 🎬 The Beta Release Model
 
-**Nemo isn't finished software. It's a living platform.**
+**Nemo is a beta release with frequent, continuous patches.**
 
-You're not downloading v1.0 and waiting. You're joining a community watching temporal computing unfold in real-time.
+You're not downloading v1.0 and waiting months. You're getting active, ongoing development with transparent release notes documenting every improvement.
 
 **How it works:**
 - ✅ **Auto-updates via CLI** - Always on latest (weekly/bi-weekly patches)
-- ✅ **Community voting** - Your feedback shapes what we build next
-- ✅ **Patch notes as events** - Exciting updates you'll anticipate
-- ✅ **Transparent development** - See exactly where we're going
-- ✅ **Co-create the future** - Your ideas become features
+- ✅ **Detailed release notes** - Every change documented clearly
+- ✅ **Bug-driven fixes** - User reports drive prioritization
+- ✅ **Performance optimization** - Continuous speed improvements
+- ✅ **Transparent development** - See exactly what's changing
 
-**The promise:** Watch Nemo evolve toward temporal git reality. Together.
+**The promise:** Watch Nemo improve continuously. Frequent updates signal active development.
 
 ## 📊 Core Features
 
@@ -284,20 +284,21 @@ In 5 years:
 
 ## 🤝 Open Source & Proprietary
 
-### Open Source (Auditable)
-Public modules available for review and contribution:
+### NEMO Code (Proprietary - Locked)
+The core reversal engine that powers perfect rewind:
+- ✅ **Works perfectly** - 5-min rewind is flawless
+- ✅ **Logic locked** - NEMO Code is never disclosed
+- ✅ **Unreplicable** - Competitors can't reverse-engineer it
+- ✅ **Transparent value** - Users see perfect reversal
+
+### Open-Source Modules (Auditable)
+Public modules available for review:
 - Snapshot system architecture
 - Timeline navigation logic
 - Storage & compression
 - API specifications
 
-### Proprietary (Competitive Moat)
-Certain advanced features distributed as compiled:
-- Keystroke reversal engine (v1.0)
-- Temporal prediction engine (v2.0+)
-- Advanced AI synthesis (v3.0+)
-
-**Why?** Open architecture builds trust. Proprietary core protects innovation.
+**Why this split?** Users get value (perfect rewind). Competitors can't copy it. Long-term defensibility maintained.
 
 ---
 

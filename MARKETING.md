@@ -88,6 +88,16 @@ Everything stays on your machine. No cloud, no telemetry, no external uploads. P
 
 **Why it matters:** Trust is the foundation of temporal computing.
 
+### 6. **Proprietary NEMO Code Powers Perfect Reversal**
+Perfect 5-minute rewind is powered by **NEMO Code**—proprietary, locked, unreplicable.
+
+- ✅ Perfect reversal every time (flawless)
+- ✅ Logic is never disclosed (competitive advantage)
+- ✅ Can't be reverse-engineered (mechanism locked)
+- ✅ Users get value (rewind works)
+
+**Why it matters:** What makes Nemo unreplicable is what we don't tell you. Perfect rewind without the blueprint.
+
 ---
 
 ## 📊 The Roadmap (& When You Get Netflix Browsing)
